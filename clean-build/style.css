@@ -3987,3 +3987,53 @@ body::before {
         width: 100%;
     }
 }
+
+/* Специальный слой оптимизации ТОЛЬКО для мобильных телефонов (смартфонов) */
+@media screen and (max-width: 767px) {
+    .screen-root {
+        padding: 6px;
+        gap: 10px;
+        /* ХАК: Пропорционально уменьшаем размер абсолютно всех шрифтов и отступов 
+           внутри листа персонажа, делая его компактной мобильной книжкой */
+        font-size: 11px; 
+    }
+
+    /* Уменьшаем щиты характеристик сверху, чтобы они влезали на экран телефона */
+    .ability-scores-container {
+        grid-template-columns: repeat(3, 1fr) !important; /* Строго 3х2 */
+        gap: 6px !important;
+    }
+
+    .ability-shield {
+        padding: 4px !important;
+        height: 60px !important;
+    }
+
+    .ability-name { font-size: 10px !important; }
+    .ability-base { font-size: 9px !important; }
+    .ability-mod { font-size: 14px !important; }
+
+    /* Компактные боевые статы (Инициатива, КД) */
+    .combat-stats {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+    
+    .defense-box, .condition-box {
+        grid-column: span 2; /* Защиты и состояния растягиваем во всю ширину */
+    }
+
+    /* 🚨 КРИТИЧНО: Сдвигаем плавающие кнопки сайдбара, 
+       чтобы они больше НЕ перекрывали текст навыков на маленьком экране */
+    .sidebar-container {
+        z-index: 9999; /* Поверх всего */
+    }
+    
+    .sidebar-trigger-btn {
+        left: -40px !important; /* Прижимаем плотнее к краю */
+        width: 35px !important;
+        height: 35px !important;
+        font-size: 14px !important;
+    }
+}
