@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&D Character Sheet</title>
+    <link rel="stylesheet" href="style.css?v=1.1">
+</head>
+<body>
+    <div class="screen-root">
+
+        <!-- ===== HEADER ROW ===== -->
+
+        <div class="char-header">
+            <div class="ability-scores-container">
+                    <div class="ability-shield" data-ability="str" onclick="handleAbilityClick('str')">
+                    <span class="ability-mod">+1</span>
+                    <span class="ability-name">STR</span>
+                    <span class="ability-base">13</span>
+                    <span class="ability-bonus-btns"><button class="ability-minus-btn" onclick="event.stopPropagation();handleAbilityMinus('str')">−</button><button class="ability-plus-btn" onclick="event.stopPropagation();handleAbilityPlus('str')">+</button></span>
+                </div>
+                    <div class="ability-shield" data-ability="dex" onclick="handleAbilityClick('dex')">
+                    <span class="ability-mod">+2</span>
+                    <span class="ability-name">DEX</span>
+                    <span class="ability-base">15</span>
+                    <span class="ability-bonus-btns"><button class="ability-minus-btn" onclick="event.stopPropagation();handleAbilityMinus('dex')">−</button><button class="ability-plus-btn" onclick="event.stopPropagation();handleAbilityPlus('dex')">+</button></span>
+                </div>
+                <div class="ability-shield" data-ability="con" onclick="handleAbilityClick('con')">
+                    <span class="ability-mod">+1</span>
+                    <span class="ability-name">CON</span>
+                    <span class="ability-base">12</span>
+                    <span class="ability-bonus-btns"><button class="ability-minus-btn" onclick="event.stopPropagation();handleAbilityMinus('con')">−</button><button class="ability-plus-btn" onclick="event.stopPropagation();handleAbilityPlus('con')">+</button></span>
+                </div>
+                <div class="ability-shield" data-ability="int" onclick="handleAbilityClick('int')">
+                    <span class="ability-mod">+0</span>
+                    <span class="ability-name">INT</span>
+                    <span class="ability-base">10</span>
+                    <span class="ability-bonus-btns"><button class="ability-minus-btn" onclick="event.stopPropagation();handleAbilityMinus('int')">−</button><button class="ability-plus-btn" onclick="event.stopPropagation();handleAbilityPlus('int')">+</button></span>
+                </div>
+                <div class="ability-shield" data-ability="wis" onclick="handleAbilityClick('wis')">
+                    <span class="ability-mod">+2</span>
+                    <span class="ability-name">WIS</span>
+                    <span class="ability-base">14</span>
+                    <span class="ability-bonus-btns"><button class="ability-minus-btn" onclick="event.stopPropagation();handleAbilityMinus('wis')">−</button><button class="ability-plus-btn" onclick="event.stopPropagation();handleAbilityPlus('wis')">+</button></span>
+                </div>
+                <div class="ability-shield" data-ability="cha" onclick="handleAbilityClick('cha')">
+                    <span class="ability-mod">+4</span>
+                    <span class="ability-name">CHA</span>
+                    <span class="ability-base">18</span>
+                    <span class="ability-bonus-btns"><button class="ability-minus-btn" onclick="event.stopPropagation();handleAbilityMinus('cha')">−</button><button class="ability-plus-btn" onclick="event.stopPropagation();handleAbilityPlus('cha')">+</button></span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="proficiency-badge">
+                    <div class="badge-label">Proficiency</div>
+                    <div class="badge-value">+4</div>
+                </div>
+                <div class="speed-badge">
+                    <div class="badge-label">Speed</div>
+                    <div class="badge-value">30</div>
+                </div>
+                <div class="inspiration-badge">
+                    <div class="badge-value">&#9733;</div>
+                </div>
+                <div class="hp-block">
+                    <div class="hp-buttons">
+                        <button class="hp-btn heal" title="Heal">&#10010;</button>
+                        <div class="hp-divider"></div>
+                        <button class="hp-btn damage" title="Damage">&#10011;</button>
+                    </div>
+                    <div class="hp-display">
+                        <div class="hp-current">0 / 0</div>
+                        <div class="hp-label">HIT POINTS</div>
+                        <div class="hp-hit-dice">
+                            <span class="hit-dice-display"><span class="hit-dice-current">0</span> / <span class="hit-dice-max">0</span></span>
+                            <span class="hit-dice-type">d8</span>
+                        </div>
+                    </div>
+                    <div class="hp-temp">
+                        <span class="hp-temp-label">TEMP</span>
+                        <span class="hp-temp-value">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== BODY ROW ===== -->
+
+        <!-- LEFT COLUMN -->
+        <div class="left-section">
+
+            <!-- SAVING THROWS -->
+            <div id="module-saving-throws" class="phb-module">
+                <div class="section-header">
+                    <span class="section-title">Saving Throws</span>
+                </div>
+                <div class="module-body">
+                    <div class="saving-row">
+                        <div class="proficiency-dot filled"></div>
+                        <span class="saving-name">STR +3</span>
+                        <div class="bonus-hex">+3</div>
+                    </div>
+                    <div class="saving-row">
+                        <div class="proficiency-dot filled"></div>
+                        <span class="saving-name">DEX +4</span>
+                        <div class="bonus-hex">+4</div>
+                    </div>
+                    <div class="saving-row">
+                        <div class="proficiency-dot"></div>
+                        <span class="saving-name">CON +2</span>
+                        <div class="bonus-hex">+2</div>
+                    </div>
+                    <div class="saving-row">
+                        <div class="proficiency-dot"></div>
+                        <span class="saving-name">INT +1</span>
+                        <div class="bonus-hex">+1</div>
+                    </div>
+                    <div class="saving-row">
+                        <div class="proficiency-dot filled"></div>
+                        <span class="saving-name">WIS +4</span>
+                        <div class="bonus-hex">+4</div>
+                    </div>
+                    <div class="saving-row">
+                        <div class="proficiency-dot filled"></div>
+                        <span class="saving-name">CHA +6</span>
+                        <div class="bonus-hex">+6</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SENSES -->
+            <div id="module-senses" class="phb-module">
+                <div class="section-header">
+                    <span class="section-title">Senses</span>
+                </div>
+                <div class="module-body">
+                    <div class="sense-row" data-skill="Perception">
+                        <span class="sense-name">Passive Perception</span>
+                        <div class="sense-value">10</div>
+                    </div>
+                    <div class="sense-row" data-skill="Investigation">
+                        <span class="sense-name">Investigation</span>
+                        <div class="sense-value">10</div>
+                    </div>
+                    <div class="sense-row" data-skill="Insight">
+                        <span class="sense-name">Insight</span>
+                        <div class="sense-value">10</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROFICIENCIES -->
+            <div id="module-proficiencies" class="phb-module">
+                <div class="section-header">
+                    <span class="section-title">Proficiencies</span>
+                </div>
+                <div class="module-body" id="proficiencies-body">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- CENTER COLUMN -->
+        <div class="center-col">
+
+            <!-- SKILLS -->
+            <div class="section-block skills-block">
+                <div class="section-header">
+                    <span class="section-title">Skills</span>
+                    <span class="section-gear-icon">&#9881;</span>
+                </div>
+                <div id="skill-validation-hint" class="validation-hint selection-counter hidden"></div>
+                <div class="skill-groups-wrapper">
+                    <div class="skill-group">
+                        <div class="skill-group-header"><span class="skill-group-abbr">СИЛ</span></div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">STR</span>
+                            <span class="skill-name">Athletics</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-group">
+                        <div class="skill-group-header"><span class="skill-group-abbr">ЛОВ</span></div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">DEX</span>
+                            <span class="skill-name">Acrobatics</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">DEX</span>
+                            <span class="skill-name">Sleight of Hand</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">DEX</span>
+                            <span class="skill-name">Stealth</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-group">
+                        <div class="skill-group-header"><span class="skill-group-abbr">ИНТ</span></div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">INT</span>
+                            <span class="skill-name">Arcana</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">INT</span>
+                            <span class="skill-name">History</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">INT</span>
+                            <span class="skill-name">Investigation</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">INT</span>
+                            <span class="skill-name">Nature</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">INT</span>
+                            <span class="skill-name">Religion</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-group">
+                        <div class="skill-group-header"><span class="skill-group-abbr">МУД</span></div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">WIS</span>
+                            <span class="skill-name">Animal Handling</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">WIS</span>
+                            <span class="skill-name">Insight</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">WIS</span>
+                            <span class="skill-name">Medicine</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">WIS</span>
+                            <span class="skill-name">Perception</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">WIS</span>
+                            <span class="skill-name">Survival</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-group">
+                        <div class="skill-group-header"><span class="skill-group-abbr">ХАР</span></div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">CHA</span>
+                            <span class="skill-name">Deception</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">CHA</span>
+                            <span class="skill-name">Intimidation</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">CHA</span>
+                            <span class="skill-name">Performance</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                        <div class="skill-row" data-class-skill="true">
+                            <div class="proficiency-dot"></div>
+                            <span class="skill-ability">CHA</span>
+                            <span class="skill-name">Persuasion</span>
+                            <span class="skill-bonus">+0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="right-col">
+
+            <!-- UPPER LEVEL: Combat Stats -->
+            <div class="combat-stats">
+                <div class="initiative-box">
+                    <div class="initiative-label">Initiative</div>
+                    <div class="initiative-value">+2</div>
+                </div>
+                <div class="armor-box">
+                    <div class="shield-icon">
+                        <span class="shield-value">13</span>
+                    </div>
+                    <div class="armor-label">Armor Class</div>
+                </div>
+                <div class="defense-box">
+                    <div class="defense-title">Defenses</div>
+                    <ul class="defense-list">
+                        <li>Fire — 10</li>
+                        <li>Cold — 14</li>
+                        <li>Lightning — 12</li>
+                    </ul>
+                </div>
+                <div class="condition-box">
+                    <div class="condition-title">Conditions</div>
+                    <ul class="condition-list">
+                        <li class="empty">None</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- TAB NAVIGATION -->
+            <div class="tab-navigation">
+                <div class="tab-header">
+                    <button class="tab-link active" data-tab="actions">Actions</button>
+                    <button class="tab-link" data-tab="spells">Spells</button>
+                    <button class="tab-link" data-tab="equipment">Equipment</button>
+                    <button class="tab-link" data-tab="features">Features</button>
+                    <button class="tab-link" data-tab="notes">Notes</button>
+                </div>
+                <div class="tab-filters">
+                    <button class="filter-tag active">All</button>
+                    <button class="filter-tag">Attack</button>
+                    <button class="filter-tag">Action</button>
+                    <button class="filter-tag">Bonus</button>
+                    <button class="filter-tag">Reaction</button>
+                    <button class="filter-tag">Legend</button>
+                </div>
+            </div>
+
+            <!-- TAB BODY -->
+            <div class="tab-body">
+                <div id="tab-actions" class="tab-pane active">
+                    <div class="actions-container"></div>
+                </div>
+
+                <div id="tab-spells" class="tab-pane">
+                    <div class="spellcasting-header">
+                        <span class="spellcasting-ability">Spellcasting Ability: CHA</span>
+                        <span class="spell-save-dc">Save DC 15</span>
+                        <span class="spell-modifier">Spell Modifier +7</span>
+                    </div>
+                    <div id="spell-status-bar" class="spell-status-bar selection-counter hidden"></div>
+                    <div id="spell-slots-container" class="spell-slots-container"></div>
+                    <div id="spell-selection-container" class="spell-selection-container">
+                        <div style="color: #9e9e9e; padding: 10px;">Select a spellcasting class first</div>
+                    </div>
+                    <div id="cantrip-validation-hint" class="validation-hint selection-counter hidden"></div>
+                    <div id="spell-validation-hint" class="validation-hint selection-counter hidden"></div>
+                    <div id="secrets-validation-hint" class="validation-hint selection-counter hidden"></div>
+                </div>
+
+                <div id="tab-equipment" class="tab-pane">
+                    <div class="spell-search-wrapper">
+                        <input type="text" id="inventory-search" class="spell-search-input" placeholder="Поиск по базе предметов...">
+                        <button class="spell-search-clear" id="inventory-search-clear" title="Очистить">×</button>
+                    </div>
+                    <div id="inventory-search-results" class="inventory-search-results hidden"></div>
+                    <div id="equipment-list" class="equipment-list"></div>
+                </div>
+
+                <div id="tab-features" class="tab-pane">
+                    <div class="tab-empty-placeholder">Features</div>
+                </div>
+
+                <div id="tab-notes" class="tab-pane">
+                    <div class="tab-empty-placeholder">Notes</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ===== SIDEBAR DRAWER ===== -->
+    <div class="sidebar-container" id="sidebar">
+
+        <!-- TRIGGER BUTTONS -->
+        <button class="sidebar-trigger-btn" id="btn-character-config" data-tab="character-config" title="Character Config">&#9881;</button>
+        <button class="sidebar-trigger-btn" id="btn-combat-log" data-tab="combat-log" title="Combat Log">&#9993;</button>
+        <button class="sidebar-trigger-btn" id="btn-rest-panel" data-tab="rest-panel" title="Rest Panel">&#9749;</button>
+
+        <div class="sidebar-body">
+            <div class="sidebar-content">
+                <div class="sidebar-header">
+        <div class="sidebar-tabs">
+                        <button class="sidebar-tab active" data-panel="character-config">Character Config</button>
+                        <button class="sidebar-tab" data-panel="combat-log">Combat Log</button>
+                        <button class="sidebar-tab" data-panel="rest-panel">Rest</button>
+                    </div>
+                    <button class="sidebar-close-btn" id="btn-close-sidebar">&#10005;</button>
+                </div>
+                <div class="sidebar-body-inner">
+
+                    <!-- CHARACTER CONFIG PANEL -->
+                    <div class="sidebar-panel" id="panel-character-config">
+                        <div class="config-panel">
+
+                            <!-- LEVEL UP BLOCK -->
+                            <div class="config-levelup">
+                                <div class="config-levelup-title">УРОВЕНЬ</div>
+                                <div class="config-level-selector">
+                                    <button class="config-level-arrow" id="config-level-down">&#9660;</button>
+                                    <div class="config-level-value" id="config-level-display">1</div>
+                                    <button class="config-level-arrow" id="config-level-up">&#9650;</button>
+                                </div>
+                                <div class="config-xp-bar">
+                                    <span class="config-xp-current" id="config-xp-current">0</span>
+                                    <span class="config-xp-label">/ 64,000</span>
+                                </div>
+                                <div class="config-xp-bar-bg">
+                                    <div class="config-xp-bar-fill" style="width: 0%;"></div>
+                                </div>
+                                <button class="config-next-level-btn" disabled>СЛЕДУЮЩИЙ УРОВЕНЬ</button>
+                            </div>
+
+                            <!-- RACE SELECT -->
+                            <div class="config-select-block">
+                                <div class="config-select-label">РАСА</div>
+                                <div class="config-select-wrapper">
+                                    <select class="config-select" id="config-race-select">
+                                        <option value="">ВЫБРАТЬ</option>
+                                        <option value="dwarf">DWARF</option>
+                                        <option value="elf">ELF</option>
+                                        <option value="human">HUMAN</option>
+                                        <option value="halfling">HALFLING</option>
+                                        <option value="half-elf">HALF-ELF</option>
+                                        <option value="tiefling">TIEFLING</option>
+                                        <option value="dragonborn">DRAGONBORN</option>
+                                        <option value="gnome">GNOME</option>
+                                        <option value="half-orc">HALF-ORC</option>
+                                        <option value="lizardfolk">LIZARDFOLK</option>
+                                        <option value="tabaxi">TABAXI</option>
+                                        <option value="goliath">GOLIATH</option>
+                                        <option value="aasimar">AASIMAR</option>
+                                    </select>
+                                    <div class="config-select-arrow">&#9662;</div>
+                                </div>
+                            </div>
+                            <div class="config-features-block hidden" id="config-race-features">
+                                <div class="config-features-title">ОСОБЕННОСТИ</div>
+                                <ul class="config-features-list" id="config-race-features-list">
+                                </ul>
+                            </div>
+
+                            <!-- AASIMAR CELESTIAL HERITAGE (level 3+) -->
+                            <div class="config-section hidden" id="aasimar-heritage-selection">
+                                <div class="config-section-title">НЕБЕСНОЕ НАСЛЕДИЕ</div>
+                                <div class="config-select-wrapper">
+                                    <select class="config-select" id="config-aasimar-heritage-select">
+                                        <option value="">ВЫБРАТЬ</option>
+                                    </select>
+                                    <div class="config-select-arrow">&#9662;</div>
+                                </div>
+                                <div class="config-features-block hidden" id="config-aasimar-heritage-features">
+                                    <div class="config-features-title">ОСОБЕННОСТИ</div>
+                                    <ul class="config-features-list" id="config-aasimar-heritage-features-list">
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- LIZARDFOLK HUNTER'S LORE SKILLS -->
+                            <div class="config-section hidden" id="lizardfolk-hunter-skills">
+                                <div class="config-section-title">ОХОТНИЧЬЯ МУДРОСТЬ</div>
+                                <div class="config-select-wrapper lf-skill-wrapper" id="skill-race-1">
+                                    <div class="lf-skill-selected" data-en="">НАВЫК 1</div>
+                                    <div class="lf-skill-dropdown hidden"></div>
+                                </div>
+                                <div class="config-select-wrapper lf-skill-wrapper" id="skill-race-2">
+                                    <div class="lf-skill-selected" data-en="">НАВЫК 2</div>
+                                    <div class="lf-skill-dropdown hidden"></div>
+                                </div>
+                            </div>
+
+                            <!-- CLASS SELECT -->
+                            <div class="config-select-block">
+                                <div class="config-select-label">КЛАСС</div>
+                                <div class="config-select-wrapper">
+                                    <select class="config-select" id="config-class-select">
+                                        <option value="">ВЫБРАТЬ</option>
+                                        <option value="barbarian">BARBARIAN</option>
+                                        <option value="bard">BARD</option>
+                                        <option value="cleric">CLERIC</option>
+                                        <option value="druid">DRUID</option>
+                                        <option value="fighter">FIGHTER</option>
+                                        <option value="monk">MONK</option>
+                                        <option value="paladin">PALADIN</option>
+                                        <option value="ranger">RANGER</option>
+                                        <option value="rogue">ROGUE</option>
+                                        <option value="sorcerer">SORCERER</option>
+                                        <option value="warlock">WARLOCK</option>
+                                        <option value="wizard">WIZARD</option>
+                                        <option value="artificer">ARTIFICER</option>
+                                    </select>
+                                    <div class="config-select-arrow">&#9662;</div>
+                                </div>
+                            </div>
+                            <div class="config-features-block hidden" id="config-class-features">
+                                <div class="config-features-title">ОСОБЕННОСТИ</div>
+                                <ul class="config-features-list" id="config-class-features-list">
+                                </ul>
+                            </div>
+
+                            <!-- SUBCLASS SELECT -->
+                            <div class="config-section hidden" id="subclass-selection">
+                                <div class="config-section-title" id="subclass-title">SACRED OATH</div>
+                                <div class="config-select-wrapper">
+                                    <select class="config-select" id="config-subclass-select">
+                                        <option value="">ВЫБРАТЬ</option>
+                                    </select>
+                                    <div class="config-select-arrow">&#9662;</div>
+                                </div>
+                                <div class="config-features-block hidden" id="config-subclass-features">
+                                    <div class="config-features-title">ОСОБЕННОСТИ ПОДКЛАССА</div>
+                                    <ul class="config-features-list" id="config-subclass-features-list">
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- TOTEM SPIRIT SELECTION -->
+                            <div class="config-section hidden" id="totem-spirit-selection">
+                                <div class="config-section-title">ТОТЕМНЫЙ ДУХ</div>
+                                <div class="config-select-wrapper">
+                                    <select class="config-select" id="config-totem-spirit-select">
+                                        <option value="">ВЫБРАТЬ</option>
+                                        <option value="bear">МЕДВЕДЬ</option>
+                                        <option value="eagle">ОРЕЛ</option>
+                                        <option value="wolf">ВОЛК</option>
+                                    </select>
+                                    <div class="config-select-arrow">&#9662;</div>
+                                </div>
+                            </div>
+
+                            <!-- EXPERTISE SELECTION -->
+                            <div class="config-section hidden" id="expertise-selection">
+                                <div class="config-section-title">ЭКСПЕРТИЗА</div>
+                                <div class="config-expertise-hint" id="expertise-hint">Выберите навыки для экспертизы</div>
+                                <div class="config-expertise-list" id="expertise-skill-list">
+                                </div>
+                            </div>
+
+                            <!-- SWORDS FIGHTING STYLE -->
+                            <div class="config-section hidden" id="swords-fighting-style">
+                                <div class="config-section-title">СТИЛЬ БОЯ</div>
+                                <div class="config-select-wrapper">
+                                    <select class="config-select" id="config-fighting-style-select">
+                                        <option value="">ВЫБРАТЬ</option>
+                                        <option value="dueling">Дуэлянт</option>
+                                        <option value="two-weapon">Сражение двумя оружиями</option>
+                                    </select>
+                                    <div class="config-select-arrow">&#9662;</div>
+                                </div>
+                            </div>
+
+                            <!-- SWORDS WEAPON PROFICIENCY -->
+                            <div class="config-section hidden" id="swords-weapon-prof">
+                                <div class="config-section-title">ОРЕЖИЕ НА ВЫБОР</div>
+                                <div class="config-select-wrapper">
+                                    <select class="config-select" id="config-swords-weapon-select">
+                                        <option value="">ВЫБРАТЬ</option>
+                                        <option value="musket">Мушкет</option>
+                                        <option value="glaive">Глефа</option>
+                                        <option value="hammer-war">WAR HAMMER</option>
+                                        <option value="lance">LANCE</option>
+                                        <option value="flail">FLAIL</option>
+                                        <option value="scimitar">SCIMITAR</option>
+                                        <option value="longsword">LONGSWORD</option>
+                                        <option value="battleaxe">BATTLEAXE</option>
+                                        <option value="crossbow-heavy">HEAVY CROSSBOW</option>
+                                        <option value="crossbow-hand">HAND CROSSBOW</option>
+                                        <option value="longbow">LONGBOW</option>
+                                        <option value="trident">TRIDENT</option>
+                                        <option value="greataxe">GREATAXE</option>
+                                        <option value="greatsword">GREATSWORD</option>
+                                        <option value="morningstar">MORNINGSTAR</option>
+                                        <option value="pike">PIKE</option>
+                                        <option value="shortsword">SHORTSWORD</option>
+                                    </select>
+                                    <div class="config-select-arrow">&#9662;</div>
+                                </div>
+                            </div>
+
+                            <!-- ABILITY SCORE POOL -->
+                            <div class="config-ability-pool config-locked" id="ability-pool-block">
+                                <div class="config-pool-title">НАЗНАЧЕНИЕ ХАРАКТЕРИСТИК</div>
+                                <div class="config-pool-values" id="ability-pool">
+                                    <div class="pool-value" data-value="15" onclick="handlePoolClick(15)">15</div>
+                                    <div class="pool-value" data-value="14" onclick="handlePoolClick(14)">14</div>
+                                    <div class="pool-value" data-value="13" onclick="handlePoolClick(13)">13</div>
+                                    <div class="pool-value" data-value="12" onclick="handlePoolClick(12)">12</div>
+                                    <div class="pool-value" data-value="10" onclick="handlePoolClick(10)">10</div>
+                                    <div class="pool-value" data-value="8" onclick="handlePoolClick(8)">8</div>
+                                </div>
+                                <div class="config-pool-hint">Выберите число, затем нажмите на характеристику для назначения</div>
+                            </div>
+
+                             <!-- BONUS POINTS -->
+                             <div class="config-bonus-points hidden" id="bonus-points-block">
+                                 <div class="config-bonus-title">ASI БОНУСНЫЕ ОЧКА</div>
+                                 <div class="config-bonus-counter" id="bonus-points-counter">0</div>
+                                 <div class="config-bonus-hint">Нажмите + на характеристике для увеличения, − для возврата</div>
+                               <div class="config-asi-choices" id="config-asi-choices"></div>
+                               </div>
+
+                            <!-- BACKGROUND SELECT -->
+                            <div class="config-select-block">
+                                <div class="config-select-label">ПРЕДЫСТОРИЯ</div>
+                                <div class="config-select-wrapper">
+                                    <select class="config-select" id="config-background-select">
+                                        <option value="">ВЫБРАТЬ</option>
+                                        <option value="acolyte">ACOLYTE</option>
+                                        <option value="charlatan">CHARLATAN</option>
+                                        <option value="criminal">CRIMINAL</option>
+                                        <option value="entertainer">ENTERTAINER</option>
+                                        <option value="folk-hero">FOLK HERO</option>
+                                        <option value="guild-artisan">GUILD ARTISAN</option>
+                                        <option value="hermit">HERMIT</option>
+                                        <option value="noble">NOBLE</option>
+                                        <option value="outlander">OUTLANDER</option>
+                                        <option value="sage">SAGE</option>
+                                        <option value="sailor">SAILOR</option>
+                                        <option value="pirate">PIRATE</option>
+                                        <option value="soldier">SOLDIER</option>
+                                        <option value="urchin">URCHIN</option>
+                                    </select>
+                                    <div class="config-select-arrow">&#9662;</div>
+                                </div>
+                            </div>
+                            <div class="config-features-block hidden" id="config-background-features">
+                                <div class="config-features-title">ОСОБЕННОСТИ</div>
+                                <ul class="config-features-list" id="config-background-features-list">
+                                </ul>
+                            </div>
+
+                            <!-- CONFIRM BUTTON -->
+                            <div id="validation-hints-box"></div>
+                                <button class="config-confirm-btn" id="config-confirm-btn" disabled>ПОДТВЕРДИТЬ</button>
+
+                        </div>
+                    </div>
+
+                    <!-- COMBAT LOG PANEL -->
+                    <div class="sidebar-panel hidden" id="panel-combat-log">
+                        <div id="combat-log-messages">
+                        <div class="log-card">
+                            <div class="log-timestamp">15:29:59</div>
+                            <div class="log-message"><span class="highlight">Aelindra</span> cast <span class="magic">Chaos Bolt</span> on <span class="damage">Goblin Boss</span> &#8212; <span class="damage">18 damage</span></div>
+                        </div>
+                        <div class="log-card">
+                            <div class="log-timestamp">15:29:42</div>
+                            <div class="log-message"><span class="highlight">Aelindra</span> used <span class="magic">Wild Magic Surge</span> &#8212; <span class="magic">Feather Fall triggered</span></div>
+                        </div>
+                        <div class="log-card">
+                            <div class="log-timestamp">15:29:15</div>
+                            <div class="log-message"><span class="highlight">Aelindra</span> cast <span class="magic">Fire Bolt</span> on <span class="damage">Goblin A</span> &#8212; <span class="damage">12 damage</span></div>
+                        </div>
+                        <div class="log-card">
+                            <div class="log-timestamp">15:28:58</div>
+                            <div class="log-message"><span class="highlight">Thorn</span> used <span class="heal">Second Wind</span> &#8212; healed <span class="heal">6 HP</span></div>
+                        </div>
+                        <div class="log-card">
+                            <div class="log-timestamp">15:28:30</div>
+                            <div class="log-message"><span class="highlight">Thorn</span> hit <span class="damage">Goblin B</span> with <span class="highlight">Longsword</span> &#8212; <span class="damage">9 slashing damage</span></div>
+                        </div>
+                        <div class="log-card">
+                            <div class="log-timestamp">15:28:12</div>
+                            <div class="log-message"><span class="highlight">Aelindra</span> cast <span class="magic">Chaos Bolt</span> on <span class="damage">Goblin C</span> &#8212; <span class="damage">14 damage</span></div>
+                        </div>
+                        <div class="log-card older">
+                            <div class="log-timestamp">15:27:45</div>
+                            <div class="log-message"><span class="highlight">Thorn</span> attacked <span class="damage">Goblin A</span> with <span class="highlight">Longsword</span> &#8212; <span class="damage">7 slashing damage</span></div>
+                        </div>
+                        <div class="log-card older">
+                            <div class="log-timestamp">15:27:22</div>
+                            <div class="log-message"><span class="highlight">Aelindra</span> cast <span class="magic">Fire Bolt</span> &#8212; missed <span class="damage">Goblin B</span></div>
+                        </div>
+                        <div class="log-card older-2">
+                            <div class="log-timestamp">15:26:58</div>
+                            <div class="log-message"><span class="highlight">Thorn</span> moved to <span class="highlight">position E4</span></div>
+                        </div>
+                        <div class="log-card older-2">
+                            <div class="log-timestamp">15:26:30</div>
+                            <div class="log-message"><span class="highlight">Aelindra</span> cast <span class="magic">Shield</span> as reaction &#8212; <span class="magic">AC becomes 18 until start of next turn</span></div>
+                        </div>
+                        <div class="log-card older-2">
+                            <div class="log-timestamp">15:25:59</div>
+                            <div class="log-message"><span class="highlight">Goblin Boss</span> hit <span class="highlight">Thorn</span> with scimitar &#8212; <span class="damage">8 piercing damage</span></div>
+                        </div>
+                        <div class="log-card older-2">
+                            <div class="log-timestamp">15:25:30</div>
+                            <div class="log-message"><span class="highlight">Initiative</span> rolled &#8212; <span class="highlight">Aelindra</span> (22), <span class="highlight">Thorn</span> (18), <span class="highlight">Goblin Boss</span> (14)</div>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- REST PANEL -->
+                    <div class="sidebar-panel hidden" id="panel-rest-panel">
+                        <div class="config-panel">
+
+                            <!-- SHORT REST -->
+                            <div class="module-block">
+                                <div class="module-body">
+                                    <div class="rest-section">
+                                        <div class="rest-section-title">SHORT REST</div>
+                                        <div class="rest-info">Hit Dice: <span id="rest-hd-available">0</span> / <span id="rest-hd-total">0</span></div>
+                                        <div class="rest-info">HP Recovery: <span id="rest-hp-recovery">0</span></div>
+                                        <button class="rest-btn" id="btn-short-rest">Take Short Rest</button>
+                                        <div class="rest-result hidden" id="short-rest-result"></div>
+                                    </div>
+                                </div>
+                                <div class="module-label-strip">SHORT REST</div>
+                            </div>
+
+                            <!-- LONG REST -->
+                            <div class="module-block">
+                                <div class="module-body">
+                                    <div class="rest-section">
+                                        <div class="rest-section-title">LONG REST</div>
+                                        <div class="rest-info">Current HP: <span id="rest-hp-current">0</span> / <span id="rest-hp-max">0</span></div>
+                                        <div class="rest-info">HD Recovered: <span id="rest-hd-recover">0</span></div>
+                                        <button class="rest-btn rest-btn-long" id="btn-long-rest">Take Long Rest</button>
+                                        <div class="rest-result hidden" id="long-rest-result"></div>
+                                    </div>
+                                </div>
+                                <div class="module-label-strip">LONG REST</div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ===== SPELL DETAIL MODAL ===== -->
+    <div class="spell-modal-overlay hidden" id="spell-modal-overlay">
+        <div class="spell-modal" id="spell-modal">
+            <button class="spell-modal-close" id="spell-modal-close">&times;</button>
+            <div class="spell-modal-title" id="spell-modal-title"></div>
+            <div class="spell-modal-meta">
+                <span class="spell-modal-level" id="spell-modal-level"></span>
+                <span class="spell-modal-school" id="spell-modal-school"></span>
+            </div>
+            <div class="spell-modal-details">
+                <div class="spell-modal-detail-row">
+                    <span class="spell-modal-detail-label">Target:</span>
+                    <span class="spell-modal-detail-value" id="spell-modal-target"></span>
+                </div>
+                <div class="spell-modal-detail-row">
+                    <span class="spell-modal-detail-label">Casting Time:</span>
+                    <span class="spell-modal-detail-value" id="spell-modal-casting-time"></span>
+                </div>
+                <div class="spell-modal-detail-row">
+                    <span class="spell-modal-detail-label">Components:</span>
+                    <span class="spell-modal-detail-value" id="spell-modal-components"></span>
+                </div>
+                <div class="spell-modal-detail-row">
+                    <span class="spell-modal-detail-label">Duration:</span>
+                    <span class="spell-modal-detail-value" id="spell-modal-duration"></span>
+                </div>
+            </div>
+            <div class="spell-modal-body" id="spell-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Spell Tooltip -->
+    <div id="spell-tooltip" class="spell-tooltip hidden"></div>
+    <div id="sense-tooltip" class="sense-tooltip"></div>
+    <div id="ac-tooltip" class="ac-tooltip"></div>
+
+    <!-- Choice Modal -->
+    <div class="choice-modal-overlay hidden" id="choice-modal-overlay">
+        <div class="choice-modal" id="choice-modal">
+            <button class="choice-modal-close" id="choice-modal-close">&times;</button>
+            <div class="choice-modal-title" id="choice-modal-title"></div>
+            <div class="choice-modal-subtitle" id="choice-modal-subtitle"></div>
+            <div class="choice-modal-list" id="choice-modal-list"></div>
+            <div class="choice-modal-footer" id="choice-modal-footer"></div>
+        </div>
+    </div>
+
+    <!-- Скрипты в самом низу вашего файла index.html перед </body> -->
+    <script src="data/localization.js?v=1.2"></script>
+    <script src="data/subclasses.js?v=1.2"></script>
+    <script src="data/classes.js?v=1.2"></script>
+    <script src="data/spells.js?v=1.2"></script>
+    <script src="data/races.js?v=1.2"></script>
+    <script src="data/items.js?v=1.2"></script>
+    <script src="data/feats.js?v=1.2"></script>
+    <script src="core.js?v=1.2"></script>
+    <script src="ui.js?v=1.2"></script>
+    <script src="script.js?v=1.2"></script>
+</body>
+</html>
