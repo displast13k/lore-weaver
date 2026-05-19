@@ -1,4 +1,15 @@
-﻿var panels = document.querySelectorAll('.sidebar-panel');
+﻿window.deviceInfo = {
+    isTablet: window.innerWidth <= 1366 && window.innerWidth >= 768,
+    isMobile: window.innerWidth < 768,
+    isTouch: ('ontouchstart' in window) || (navigator.maxTouchPoints > 0),
+    checkStatus() {
+        this.isTablet = window.innerWidth <= 1366 && window.innerWidth >= 768;
+        this.isMobile = window.innerWidth < 768;
+    }
+};
+window.addEventListener('resize', () => { window.deviceInfo.checkStatus(); });
+
+var panels = document.querySelectorAll('.sidebar-panel');
 var sidebarTabs = document.querySelectorAll('.sidebar-tab');
 var sidebarContainer = document.getElementById('sidebar');
 var spellTooltip = document.getElementById('spell-tooltip');
