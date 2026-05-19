@@ -42,12 +42,12 @@ body::before {
 .screen-root {
     display: grid;
     grid-template-columns: 350px 350px 1fr;
-    grid-template-rows: 90px 1fr;
+    grid-template-rows: auto 1fr; /* Меняем фиксированные 90px на auto */
     gap: 20px;
-    width: 100%;       /* Занимает всю ширину экрана любого устройства */
-    max-width: 1400px; /* Но на ПК не растягивается больше каноничных 1400px */
-    height: 100vh;
-    margin: 0 auto;    /* Центрирует лист на больших мониторах */
+    width: 100%;       
+    max-width: 1400px; 
+    min-height: 100vh;
+    margin: 0 auto;    
     align-items: stretch;
     padding: 20px;
     box-sizing: border-box;
@@ -58,10 +58,10 @@ body::before {
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: 720px 1fr;
-    grid-template-rows: 90px;
+    grid-template-rows: auto; /* Убираем жесткие 90px, чтобы блоки не накладывались */
     gap: 20px;
-    width: 100%;       /* Переводим на проценты */
-    height: 90px;
+    width: 100%;       
+    height: auto; /* Разрешаем шапке растягиваться под мобильные плитки */
     margin: 0 auto;
     align-items: stretch;
 }
