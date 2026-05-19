@@ -4009,32 +4009,44 @@ body::before {
     }
 
     /* 4. ЩИТ ХАРАКТЕРИСТИКИ (Сброс абсолютного позиционирования десктопа) */
+    /* Насильно превращаем каждый щит в микро-сетку из двух строк */
     .ability-shield {
         width: 100% !important;
-        height: 80px !important; /* Фиксированная высота для мобильной плитки */
-        padding: 6px 4px !important;
+        height: 75px !important;
         box-sizing: border-box !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        position: relative !important; /* Отменяем абсолюты десктопа */
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto auto !important; /* Строго две независимые строки */
+        gap: 4px !important;
+        padding: 6px !important;
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
     }
 
-    /* Название характеристики (СИЛ, ЛОВ, ТЕЛ...) */
+    /* Название характеристики (СИЛ, ЛОВ, ТЕЛ...) падает строго в первую строку */
     .ability-name {
-        position: static !important; /* Сброс */
+        grid-row: 1 !important;
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
         font-size: 11px !important;
-        line-height: 1.2 !important;
-        margin: 0 !important;
         text-align: center !important;
+        margin: 0 !important;
+        display: block !important;
     }
 
-    /* Белая плашка с цифрой 10 */
+    /* Белая плашка с цифрой падает строго во вторую строку, исключая наложение */
     .ability-base {
-        position: static !important; /* Сброс абсолютного сдвига вверх */
+        grid-row: 2 !important;
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
         display: block !important;
-        width: auto !important;
+        width: max-content !important;
         background: #ffffff !important;
         color: #000000 !important;
         padding: 2px 8px !important;
@@ -4042,9 +4054,13 @@ body::before {
         font-size: 12px !important;
         font-weight: bold !important;
         text-align: center !important;
-        margin: 4px auto 0 auto !important;
+        margin: 0 auto !important;
     }
 
+    /* Полностью убираем модификатор и кнопки с телефона, чтобы очистить место */
+    .ability-mod, .ability-bonus-btns {
+        display: none !important;
+    }
     /* Модификатор (например, +0) */
     .ability-mod {
         position: static !important;
