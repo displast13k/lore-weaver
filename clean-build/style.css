@@ -4043,9 +4043,35 @@ body::before {
         width: 100% !important;
         gap: 10px !important;
     }
+    .proficiency-badge, .speed-badge, .inspiration-badge {
+        flex: 1 !important;
+        height: 55px !important;
+        padding: 4px !important;
+        min-width: 70px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
 
+    .badge-label {
+        font-size: 9px !important;
+        margin-bottom: 2px !important;
+    }
+
+    .badge-value {
+        font-size: 14px !important;
+    }
+    
     .hp-block {
         width: 100% !important; 
+        height: auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        padding: 8px !important;
+        box-sizing: border-box !important;
+        gap: 10px !important;
         margin-top: 5px !important;
     }
 
