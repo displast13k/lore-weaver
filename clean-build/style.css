@@ -38,28 +38,29 @@ body::before {
     z-index: 1;
 }
 
+/* === Замена блока .screen-root (строки 41-53) === */
 .screen-root {
     display: grid;
     grid-template-columns: 350px 350px 1fr;
     grid-template-rows: 90px 1fr;
     gap: 20px;
-    width: 1400px;
+    width: 100%;       /* Занимает всю ширину экрана любого устройства */
+    max-width: 1400px; /* Но на ПК не растягивается больше каноничных 1400px */
     height: 100vh;
-    margin: 0 auto;
+    margin: 0 auto;    /* Центрирует лист на больших мониторах */
     align-items: stretch;
     padding: 20px;
     box-sizing: border-box;
 }
 
-/* ===== HEADER ===== */
-
+/* === Замена блока .char-header (строки 56-66) === */
 .char-header {
     grid-column: 1 / -1;
     display: grid;
     grid-template-columns: 720px 1fr;
     grid-template-rows: 90px;
     gap: 20px;
-    width: 1400px;
+    width: 100%;       /* Переводим на проценты */
     height: 90px;
     margin: 0 auto;
     align-items: stretch;
