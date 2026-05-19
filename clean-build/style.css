@@ -3974,29 +3974,10 @@ body::before {
 }
 
 /* ==========================================================================
-   ФИНАЛЬНЫЙ СЛОЙ АДАПТИВНОСТИ ДЛЯ ПЛАНШЕТОВ И СМАРТФОНОВ
+   КОМПАКТНЫЙ МОБИЛЬНЫЙ СЛОЙ ДЛЯ СМАРТФОНОВ (до 767px)
    ========================================================================== */
-
-/* 1. ПЛАНШЕТЫ В ПОРТРЕТНОМ РЕЖИМЕ (Ширина экрана до 992px) */
-@media screen and (max-width: 992px) {
-    .screen-root {
-        display: flex !important;
-        flex-direction: column !important; 
-        height: auto !important;
-        min-height: 100vh !important;
-        overflow-y: auto !important;
-    }
-    .ability-scores-container {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 10px !important;
-    }
-    .left-section, .center-col, .right-col {
-        width: 100% !important;
-    }
-}
-
-/* 2. СМАРТФОНЫ И МОБИЛЬНЫЕ УСТРОЙСТВА (Ширина экрана до 767px) */
 @media screen and (max-width: 767px) {
+    /* 1. ГЛАВНЫЙ КОНТЕЙНЕР-СВИЗОК */
     .screen-root {
         display: flex !important;
         flex-direction: column !important; 
@@ -4006,20 +3987,19 @@ body::before {
         box-sizing: border-box !important;
         overflow-x: hidden !important; 
         height: auto !important;
-        font-size: 12px !important; 
     }
 
-    /* Полностью сбрасываем высоту шапки и убираем наезды на спасброски */
+    /* 2. ШАПКА ХАРАКТЕРИСТИК (Сброс высоты десктопа) */
     .char-header {
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
-        height: auto !important;
+        height: auto !important; /* Убираем жесткие 90px десктопа */
         gap: 12px !important;
-        margin-bottom: 25px !important; /* Даем плотный отступ до нижних блоков */
+        margin-bottom: 25px !important; /* Безопасный отступ до спасбросков */
     }
 
-    /* Характеристики встают в сетку 3 в ряд, не ломая текст внутри */
+    /* 3. СЕТКА ХАРАКТЕРИСТИК (3 в ряд) */
     .ability-scores-container {
         width: 100% !important;
         max-width: 100% !important;
@@ -4028,43 +4008,97 @@ body::before {
         gap: 8px !important;
     }
 
+    /* 4. ЩИТ ХАРАКТЕРИСТИКИ (Сброс абсолютного позиционирования десктопа) */
     .ability-shield {
         width: 100% !important;
-        height: auto !important;
-        padding: 8px 4px !important;
+        height: 80px !important; /* Фиксированная высота для мобильной плитки */
+        padding: 6px 4px !important;
         box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        position: relative !important; /* Отменяем абсолюты десктопа */
     }
 
-    /* Верхний правый блок (ХП, Профбонус, Скорость) */
-    .header-right {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: wrap !important;
-        width: 100% !important;
-        gap: 10px !important;
+    /* Название характеристики (СИЛ, ЛОВ, ТЕЛ...) */
+    .ability-name {
+        position: static !important; /* Сброс */
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+        margin: 0 !important;
+        text-align: center !important;
     }
+
+    /* Белая плашка с цифрой 10 */
+    .ability-base {
+        position: static !important; /* Сброс абсолютного сдвига вверх */
+        display: block !important;
+        width: auto !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 2px 8px !important;
+        border-radius: 4px !important;
+        font-size: 12px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        margin: 4px auto 0 auto !important;
+    }
+
+    /* Модификатор (например, +0) */
+    .ability-mod {
+        position: static !important;
+        font-size: 11px !important;
+        color: #888888 !important;
+        margin-top: 2px !important;
+    }
+
+    /* Прячем кнопки плюс/минус на смартфонах, чтобы не взрывать интерфейс */
+    .ability-bonus-btns {
+        display: none !important;
+    }
+
+    /* 5. ВЕРХНИЙ ПРАВЫЙ БЛОК (Бейджи и Хитпоинты) */
+    .header-right {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important; /* Строго 3 равные колонки в ряд */
+        width: 100% !important;
+        gap: 8px !important;
+        height: auto !important;
+        margin-top: 5px !important;
+    }
+
+    /* Схлопываем Профбонус, Скорость и Вдохновение в аккуратные плашки */
     .proficiency-badge, .speed-badge, .inspiration-badge {
-        flex: 1 !important;
-        height: 55px !important;
-        padding: 4px !important;
-        min-width: 70px !important;
+        width: 100% !important;
+        height: 55px !important; /* Делаем их низкими */
         box-sizing: border-box !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
+        margin: 0 !important;
+        position: relative !important;
+        left: auto !important;
+        right: auto !important;
+        padding: 4px !important;
     }
 
     .badge-label {
         font-size: 9px !important;
-        margin-bottom: 2px !important;
+        text-align: center !important;
+        margin: 0 0 2px 0 !important;
     }
 
     .badge-value {
         font-size: 14px !important;
+        text-align: center !important;
+        line-height: 1 !important;
     }
-    
+
+    /* 6. МОБИЛЬНЫЙ БЛОК ХИТПОИНТОВ (Растягиваем во всю ширину под бейджами) */
     .hp-block {
+        grid-column: span 3 !important; /* Занимает все 3 колонки грида */
         width: 100% !important; 
         height: auto !important;
         display: flex !important;
@@ -4075,7 +4109,11 @@ body::before {
         margin-top: 5px !important;
     }
 
-    /* Схлопываем все колонки в единую ленту */
+    .hp-display {
+        flex: 1 !important;
+    }
+
+    /* 7. СХЛОПЫВАНИЕ ОСНОВНЫХ КОЛОНОК ЛИСТА В ЕДИНУЮ ЛЕНТУ */
     .left-section, .center-col, .right-col {
         width: 100% !important;
         display: flex !important;
@@ -4084,11 +4122,11 @@ body::before {
         grid-row: auto !important;
     }
 
-    /* Фиксируем плавающие кнопки сайдбара, чтобы они не лезли на текст */
+    /* 8. ИСПРАВЛЕНИЕ САЙДБАРА (Уводим кнопки, чтобы не перекрывали текст) */
     .sidebar-container {
-        position: fixed !important; 
+        position: fixed !important; /* Привязка к экрану, а не к сетке */
         right: 12px !important;
-        top: 20% !important;
+        top: 25% !important;
         left: auto !important;
         width: auto !important;
         height: auto !important;
@@ -4099,7 +4137,7 @@ body::before {
     }
 
     .sidebar-trigger-btn {
-        position: static !important; 
+        position: static !important; /* Сброс десктопного сдвига влево */
         width: 38px !important;
         height: 38px !important;
         border-radius: 50% !important;
