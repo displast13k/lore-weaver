@@ -2,7 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+        (function() {
+            const meta = document.createElement('meta');
+            meta.name = "viewport";
+            if (window.innerWidth < 768) {
+                // Вынуждаем мобильный Хром/Сафари сжать десктопные 1400px ровно под экран iPhone без каши
+                meta.content = "width=1400, initial-scale=" + (window.innerWidth / 1400);
+            } else {
+                // Для iPad и ПК оставляем стандартную гибкую логику
+                meta.content = "width=device-width, initial-scale=1.0";
+            }
+            document.getElementsByTagName('head')[0].appendChild(meta);
+        })();
+    </script>
     <title>D&D Character Sheet</title>
     <link rel="stylesheet" href="style.css?v=1.1">
 </head>
