@@ -4038,3 +4038,62 @@ body::before {
         font-size: 14px !important;
     }
 }
+/* Полный сброс для экранов смартфонов */
+@media screen and (max-width: 767px) {
+    .screen-root {
+        display: flex !important;
+        flex-direction: column !important; /* Выстраиваем всё строго в один вертикальный ряд */
+        width: 100vw !important;
+        max-width: 100vw !important;
+        padding: 8px !important;
+        box-sizing: border-box;
+        overflow-x: hidden !important; /* Убираем горизонтальный наклон и скролл */
+    }
+
+    /* Схлопываем шапку */
+    .char-header {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    /* Характеристики встают компактно 3 в ряд */
+    .ability-scores-container {
+        width: 100% !important;
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px !important;
+    }
+
+    .ability-shield {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+
+    /* Все три колонки десктопа превращаются в последовательные блоки свитка */
+    .left-section, .center-col, .right-col {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    /* Уводим плавающие кнопки сайдбара, чтобы они НЕ перекрывали интерфейс */
+    .sidebar-container {
+        position: fixed !important; /* Привязываем к экрану телефона, а не к сетке */
+        right: 10px !important;
+        top: 80px !important;
+        left: auto !important;
+        width: auto !important;
+        height: auto !important;
+        z-index: 9999 !important;
+    }
+
+    .sidebar-trigger-btn {
+        position: static !important; /* Отменяем left: -50px, который ломал верстку */
+        margin-bottom: 8px !important;
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 50% !important;
+    }
+}
