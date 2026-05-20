@@ -1491,57 +1491,57 @@ if (netConnectBtn) {
 
     // ИЗЯЩНАЯ СМЕНА ЭКРАНОВ ЧЕРЕЗ КЛАССЫ
     if (currentRole === 'dm') {
-      if (currentRole === 'dm') {
-        if (screenRoot) screenRoot.classList.add('dm-mode-active');
-        if (dmScreen) dmScreen.style.display = 'block';
+      if (screenRoot) screenRoot.classList.add('dm-mode-active');
+      if (dmScreen) dmScreen.style.display = 'block';
 
-        // НАПОЛНЕНИЕ ТЕСТОВЫМИ ИГРОКАМИ ДЛЯ ПРОВЕРКИ UI
-        const partyListContainer = document.getElementById('dm-party-list');
-        if (partyListContainer) {
-          const testPlayers = [
-            { name: "Торгар Железный", class: "Варвар / 5 ур.", hp: 58, maxHp: 65, ac: 16, pp: 12 },
-            { name: "Варис Тень", class: "Плут / 5 ур.", hp: 34, maxHp: 39, ac: 17, pp: 16 },
-            { name: "Лира Светоносная", class: "Жрец / 5 ур.", hp: 12, maxHp: 43, ac: 18, pp: 14 }
-          ];
+      // ПАНЕЛЬ ПАРТИИ (Тестовые карточки)
+      const partyListContainer = document.getElementById('dm-party-list');
+      if (partyListContainer) {
+        const testPlayers = [
+          { name: "Торгар Железный", class: "Варвар / 5 ур.", hp: 58, maxHp: 65, ac: 16, pp: 12 },
+          { name: "Варис Тень", class: "Плут / 5 ур.", hp: 34, maxHp: 39, ac: 17, pp: 16 },
+          { name: "Лира Светоносная", class: "Жрец / 5 ур.", hp: 12, maxHp: 43, ac: 18, pp: 14 }
+        ];
 
-          partyListContainer.innerHTML = '';
+        partyListContainer.innerHTML = '';
 
-          testPlayers.forEach(player => {
-            const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
-            const barColor = hpPercent < 30 ? '#ff3333' : '#22aa44';
+        testPlayers.forEach(player => {
+          const hpPercent = Math.max(0, Math.min(100, (player.hp / player.maxHp) * 100));
+          const barColor = hpPercent < 30 ? '#ff3333' : '#22aa44';
 
-            const playerCardHTML = `
-              <div class="dm-player-card">
-                <div class="dm-player-info">
-                  <span class="dm-player-name">${player.name}</span>
-                  <span class="dm-player-class">${player.class}</span>
-                </div>
-                
-                <div class="dm-player-hp-bar">
-                  <div class="dm-hp-text">ХП: ${player.hp} / ${player.maxHp}</div>
-                  <div class="dm-hp-progress-bg">
-                    <div class="dm-hp-progress-fill" style="width: ${hpPercent}%; background-color: ${barColor};"></div>
-                  </div>
-                </div>
-                
-                <div class="dm-player-stats">
-                  <div class="dm-stat-badge">
-                    <span class="label">КД</span>
-                    <span class="value">${player.ac}</span>
-                  </div>
-                  <div class="dm-stat-badge">
-                    <span class="label">ПВ</span>
-                    <span class="value">${player.pp}</span>
-                  </div>
+          const playerCardHTML = `
+            <div class="dm-player-card">
+              <div class="dm-player-info">
+                <span class="dm-player-name">${player.name}</span>
+                <span class="dm-player-class">${player.class}</span>
+              </div>
+              
+              <div class="dm-player-hp-bar">
+                <div class="dm-hp-text">ХП: ${player.hp} / ${player.maxHp}</div>
+                <div class="dm-hp-progress-bg">
+                  <div class="dm-hp-progress-fill" style="width: ${hpPercent}%; background-color: ${barColor};"></div>
                 </div>
               </div>
-            `;
-            partyListContainer.insertAdjacentHTML('beforeend', playerCardHTML);
-          });
-        }
+              
+              <div class="dm-player-stats">
+                <div class="dm-stat-badge">
+                  <span class="label">КД</span>
+                  <span class="value">${player.ac}</span>
+                </div>
+                <div class="dm-stat-badge">
+                  <span class="label">ПВ</span>
+                  <span class="value">${player.pp}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          partyListContainer.insertAdjacentHTML('beforeend', playerCardHTML);
+        });
+      }
 
     } else {
       if (screenRoot) screenRoot.classList.remove('dm-mode-active');
+      if (dmScreen) screenScreen?.style ? dmScreen.style.display = 'none' : null;
       if (dmScreen) dmScreen.style.display = 'none';
       
       // Симулятор сети: Игрок сохраняет данные в локальную память браузера
@@ -1551,7 +1551,7 @@ if (netConnectBtn) {
       alert(`Вы подключились к комнате ${roomId} как игрок ${playerName}!`);
     }
   });
-
+}
 
 // ====== ТРЕКЕР ИНИЦИАТИВЫ ГМА ======
   const initBtn = document.querySelector('.dm-initiative-panel .dm-btn-small:nth-child(1)');
