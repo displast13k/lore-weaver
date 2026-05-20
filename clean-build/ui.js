@@ -1656,4 +1656,4 @@ document.addEventListener('DOMContentLoaded', () => {
       displayMonster(foundMonster);
     });
   }
-}
+});
