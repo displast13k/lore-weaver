@@ -1632,9 +1632,9 @@ const displayMonster = (monster) => {
         <span><strong>Скорость:</strong> ${monster.speed}</span>
       </div>
 
-      ${statsHTML}
+      \${statsHTML}
       <h5 style="margin: 10px 0 5px 0; color: #ff3333; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Действия</h5>
-      ${actionsHTML}
+      \${actionsHTML}
     </div>
   `;
 
@@ -1642,6 +1642,7 @@ const displayMonster = (monster) => {
     compendiumBody.appendChild(resultContainer);
   }
 };
+
 if (searchInput) {
   searchInput.addEventListener('input', (e) => {
     const query = e.target.value.trim().toLowerCase();
