@@ -1593,11 +1593,6 @@ document.addEventListener('DOMContentLoaded', () => {
       initiativeList.innerHTML = '<div class="dm-empty-placeholder">Бой не начат</div>';
     });
   }
-  }
-});
-      initiativeList.innerHTML = '<div class="dm-empty-placeholder">Бой не начат</div>';
-    });
-  }
 
   // ====== СЛУШАТЕЛЬ ЖИВОГО ПОИСКА В СПРАВОЧНИКЕ ======
   const searchInput = document.querySelector('.dm-search-input');
