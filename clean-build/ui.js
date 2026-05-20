@@ -1448,37 +1448,37 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 // Логика управления левым сайдбаром сетевой сессии и экранами
-  const sidebar = document.getElementById('left-network-sidebar');
-  const openBtn = document.getElementById('open-network-btn');
-  const closeBtn = document.getElementById('close-network-btn');
-  const roleButtons = document.querySelectorAll('.role-btn');
-  const playerNameGroup = document.querySelector('.id-player-only');
-  
-  // Новые элементы для переключения экранов
-  const connectBtn = document.getElementById('net-connect-btn');
-  const netStatus = document.getElementById('net-status');
-  const charHeader = document.querySelector('.char-header');
-  const leftSection = document.querySelector('.left-section');
-  const centerCol = document.querySelector('.center-col');
-  const rightCol = document.querySelector('.right-col');
-  const dmScreen = document.getElementById('dm-screen-root');
+const networkSidebar = document.getElementById('left-network-sidebar');
+const openBtn = document.getElementById('open-network-btn');
+const closeBtn = document.getElementById('close-network-btn');
+const roleButtons = document.querySelectorAll('.role-btn');
+const playerNameGroup = document.querySelector('.id-player-only');
 
-  // Текущая выбранная роль (по умолчанию "player")
-  let currentRole = 'player';
+// Новые элементы для переключения экранов
+const connectBtn = document.getElementById('net-connect-btn');
+const netStatus = document.getElementById('net-status');
+const charHeader = document.querySelector('.char-header');
+const leftSection = document.querySelector('.left-section');
+const centerCol = document.querySelector('.center-col');
+const rightCol = document.querySelector('.right-col');
+const dmScreen = document.getElementById('dm-screen-root');
 
-  // Открытие сайдбара
-  if (openBtn && sidebar) {
-    openBtn.addEventListener('click', () => {
-      sidebar.classList.add('is-open');
-    });
-  }
+// Текущая выбранная роль (по умолчанию "player")
+let currentRole = 'player';
 
-  // Закрытие сайдбара
-  if (closeBtn && sidebar) {
-    closeBtn.addEventListener('click', () => {
-      sidebar.classList.remove('is-open');
-    });
-  }
+// Открытие сайдбара
+if (openBtn && networkSidebar) {
+  openBtn.addEventListener('click', () => {
+    networkSidebar.classList.add('is-open');
+  });
+}
+
+// Закрытие сайдбара
+if (closeBtn && networkSidebar) {
+  closeBtn.addEventListener('click', () => {
+    networkSidebar.classList.remove('is-open');
+  });
+}
 
   // Переключение ролей (Игрок / ГМ) внутри сайдбара
   roleButtons.forEach(btn => {
