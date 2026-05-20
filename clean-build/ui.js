@@ -1413,13 +1413,25 @@ function addLogHTML(html) {
     log.appendChild(entry);
     log.scrollTop = log.scrollHeight;
 }
-// Логика управления левым сайдбаром сетевой сессии
+// Логика управления левым сайдбаром сетевой сессии и экранами
 document.addEventListener('DOMContentLoaded', () => {
   const sidebar = document.getElementById('left-network-sidebar');
   const openBtn = document.getElementById('open-network-btn');
   const closeBtn = document.getElementById('close-network-btn');
   const roleButtons = document.querySelectorAll('.role-btn');
   const playerNameGroup = document.querySelector('.id-player-only');
+  
+  // Новые элементы для переключения экранов
+  const connectBtn = document.getElementById('net-connect-btn');
+  const netStatus = document.getElementById('net-status');
+  const charHeader = document.querySelector('.char-header');
+  const leftSection = document.querySelector('.left-section');
+  const centerCol = document.querySelector('.center-col');
+  const rightCol = document.querySelector('.right-col');
+  const dmScreen = document.getElementById('dm-screen-root');
+
+  // Текущая выбранная роль (по умолчанию "player")
+  let currentRole = 'player';
 
   // Открытие сайдбара
   if (openBtn && sidebar) {
@@ -1441,12 +1453,63 @@ document.addEventListener('DOMContentLoaded', () => {
       roleButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
+      currentRole = btn.getAttribute('data-role');
+
       // Если выбран ГМ — скрываем поле ввода имени персонажа, ГМу оно не нужно
-      if (btn.getAttribute('data-role') === 'dm') {
+      if (currentRole === 'dm') {
         if (playerNameGroup) playerNameGroup.style.display = 'none';
       } else {
         if (playerNameGroup) playerNameGroup.style.display = 'flex';
       }
     });
   });
+
+  // ОБРАБОТКА КЛИКА ПО КНОПКЕ "ПОДКЛЮЧИТЬСЯ"
+  if (connectBtn) {
+    connectBtn.addEventListener('click', () => {
+      const roomId = document.getElementById('net-room-id').value.trim();
+      const playerName = document.getElementById('net-player-name')?.value.trim();
+
+      if (!roomId) {
+        alert('Пожалуйста, введите ID Комнаты!');
+        return;
+      }
+
+      if (currentRole === 'player' && !playerName) {
+        alert('Пожалуйста, введите Имя персонажа!');
+        return;
+      }
+
+      // Имитируем успешное подключение (пока без Firebase бэкенда)
+      if (netStatus) {
+        netStatus.textContent = `Статус: Подключен к ${roomId}`;
+        netStatus.className = 'net-status online';
+      }
+
+      // Закрываем шторку сессии после подключения
+      if (sidebar) sidebar.classList.remove('is-open');
+
+      // ЛОГИКА СМЕНЫ ЭКРАНОВ
+      if (currentRole === 'dm') {
+        // Если зашел ГМ: скрываем весь лист персонажа
+        if (charHeader) charHeader.style.display = 'none';
+        if (leftSection) leftSection.style.display = 'none';
+        if (centerCol) centerCol.style.display = 'none';
+        if (rightCol) rightCol.style.display = 'none';
+
+        // И показываем панель ГМа
+        if (dmScreen) dmScreen.style.display = 'block';
+      } else {
+        // Если зашел обычный Игрок: возвращаем стандартный лист персонажа
+        if (charHeader) charHeader.style.display = 'grid';
+        if (leftSection) leftSection.style.display = 'flex';
+        if (centerCol) centerCol.style.display = 'block';
+        
+        // Экран ГМа прячем
+        if (dmScreen) dmScreen.style.display = 'none';
+        
+        alert(`Вы подключились к комнате ${roomId} как игрок ${playerName}! Ваша статистика скоро будет передана мастеру.`);
+      }
+    });
+  }
 });
