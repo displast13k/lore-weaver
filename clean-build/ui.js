@@ -1598,63 +1598,63 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.querySelector('.dm-search-input');
   const compendiumBody = document.querySelector('.dm-compendium-panel .dm-card-body');
 
-  const displayMonster = (monster) => {
-    const resultContainer = document.getElementById('dm-compendium-results') || document.createElement('div');
-    resultContainer.id = 'dm-compendium-results';
-    resultContainer.style.marginTop = '15px';
+const displayMonster = (monster) => {
+  const resultContainer = document.getElementById('dm-compendium-results') || document.createElement('div');
+  resultContainer.id = 'dm-compendium-results';
+  resultContainer.style.marginTop = '15px';
 
-    if (!monster) {
-      resultContainer.innerHTML = '<div class="dm-empty-placeholder">Существо не найдено в бестиарии</div>';
-      if (!document.getElementById('dm-compendium-results')) compendiumBody.appendChild(resultContainer);
+  if (!monster) {
+    resultContainer.innerHTML = '<div class="dm-empty-placeholder">Существо не найдено в бестиарии</div>';
+    if (!document.getElementById('dm-compendium-results')) compendiumBody.appendChild(resultContainer);
+    return;
+  }
+
+  let statsHTML = '<div style="display: flex; gap: 10px; margin: 10px 0; background: #150404; padding: 8px; border-radius: 4px; border: 1px solid #2d0b0b;">';
+  for (const [key, value] of Object.entries(monster.stats)) {
+    statsHTML += `<div style="text-align: center; flex: 1;"><span style="font-size: 10px; color: #888; display: block;">${key}</span><span style="font-size: 13px; color: #ff3333; font-weight: bold;">${value}</span></div>`;
+  }
+  statsHTML += '</div>';
+
+  let actionsHTML = '<div style="margin-top: 10px;">';
+  monster.actions.forEach(act => {
+    actionsHTML += `<p style="margin: 4px 0; font-size: 13px;"><strong style="color: #ff3333;">${act.name}:</strong> <span style="color: #bbb;">${act.desc}</span></p>`;
+  });
+  actionsHTML += '</div>';
+
+  resultContainer.innerHTML = `
+    <div style="border-top: 1px solid #4a1111; padding-top: 15px;">
+      <h4 style="margin: 0; color: #fff; font-size: 18px;">${monster.name}</h4>
+      <span style="font-size: 11px; color: #888; font-style: italic;">${monster.size}</span>
+      
+      <div style="display: flex; gap: 20px; margin-top: 10px; font-size: 13px; color: #aaa;">
+        <span><strong>КД:</strong> <span style="color: #ff3333; font-weight: bold;">${monster.ac}</span></span>
+        <span><strong>ХП:</strong> <span style="color: #00ff66;">${monster.hp}</span></span>
+        <span><strong>Скорость:</strong> ${monster.speed}</span>
+      </div>
+
+      ${statsHTML}
+      <h5 style="margin: 10px 0 5px 0; color: #ff3333; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Действия</h5>
+      ${actionsHTML}
+    </div>
+  `;
+
+  if (!document.getElementById('dm-compendium-results')) {
+    compendiumBody.appendChild(resultContainer);
+  }
+};
+
+if (searchInput) {
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.trim().toLowerCase();
+
+    if (!query) {
+      const res = document.getElementById('dm-compendium-results');
+      if (res) res.innerHTML = '';
       return;
     }
 
-    let statsHTML = '<div style="display: flex; gap: 10px; margin: 10px 0; background: #150404; padding: 8px; border-radius: 4px; border: 1px solid #2d0b0b;">';
-    for (const [key, value] of Object.entries(monster.stats)) {
-      statsHTML += `<div style="text-align: center; flex: 1;"><span style="font-size: 10px; color: #888; display: block;">${key}</span><span style="font-size: 13px; color: #ff3333; font-weight: bold;">${value}</span></div>`;
-    }
-    statsHTML += '</div>';
-
-    let actionsHTML = '<div style="margin-top: 10px;">';
-    monster.actions.forEach(act => {
-      actionsHTML += `<p style="margin: 4px 0; font-size: 13px;"><strong style="color: #ff3333;">${act.name}:</strong> <span style="color: #bbb;">${act.desc}</span></p>`;
-    });
-    actionsHTML += '</div>';
-
-    resultContainer.innerHTML = `
-      <div style="border-top: 1px solid #4a1111; padding-top: 15px;">
-        <h4 style="margin: 0; color: #fff; font-size: 18px;">${monster.name}</h4>
-        <span style="font-size: 11px; color: #888; font-style: italic;">${monster.size}</span>
-        
-        <div style="display: flex; gap: 20px; margin-top: 10px; font-size: 13px; color: #aaa;">
-          <span><strong>КД:</strong> <span style="color: #ff3333; font-weight: bold;">${monster.ac}</span></span>
-          <span><strong>ХП:</strong> <span style="color: #00ff66;">${monster.hp}</span></span>
-          <span><strong>Скорость:</strong> ${monster.speed}</span>
-        </div>
-
-        ${statsHTML}
-        <h5 style="margin: 10px 0 5px 0; color: #ff3333; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Действия</h5>
-        ${actionsHTML}
-      </div>
-    `;
-
-    if (!document.getElementById('dm-compendium-results')) {
-      compendiumBody.appendChild(resultContainer);
-    }
-  }; // <-- СЮДА ВЕРНУЛАСЬ СКОБКА, ЗАКРЫВАЮЩАЯ DISPLAYMONSTER!
-
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      const query = e.target.value.trim().toLowerCase();
-
-      if (!query) {
-        const res = document.getElementById('dm-compendium-results');
-        if (res) res.innerHTML = '';
-        return;
-      }
-
-      const foundMonster = monsterCompendium.find(m => m.name.toLowerCase().includes(query));
-      displayMonster(foundMonster);
-    });
-  }
-};
+    const foundMonster = monsterCompendium.find(m => m.name.toLowerCase().includes(query));
+    displayMonster(foundMonster);
+  });
+}
+});
