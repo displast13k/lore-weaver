@@ -1642,7 +1642,6 @@ const displayMonster = (monster) => {
     compendiumBody.appendChild(resultContainer);
   }
 };
-
 if (searchInput) {
   searchInput.addEventListener('input', (e) => {
     const query = e.target.value.trim().toLowerCase();
@@ -1655,5 +1654,5 @@ if (searchInput) {
 
     const foundMonster = monsterCompendium.find(m => m.name.toLowerCase().includes(query));
     displayMonster(foundMonster);
+    });
   }
-}
