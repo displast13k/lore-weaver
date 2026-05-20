@@ -4120,10 +4120,9 @@ body::before {
 .dm-screen-container {
   position: fixed !important;
   top: 0 !important;
-  /* Левый край намертво зафиксирован — тут всё супер */
-  left: 320px !important; 
-  /* Увеличиваем вычитаемую ширину, чтобы аккуратно отодвинуть правый край от сайдбара */
-  width: calc(100vw - 720px) !important; 
+  left: 320px !important; /* Левый край зафиксирован идеально */
+  /* Увеличиваем вычитание до 780px, чтобы гарантированно отодвинуть правый край от нахлеста */
+  width: calc(100vw - 780px) !important; 
   height: 100vh !important;
   padding: 40px 20px 40px 20px !important; 
   box-sizing: border-box !important;
