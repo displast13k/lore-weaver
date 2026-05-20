@@ -1414,40 +1414,6 @@ function addLogHTML(html) {
     log.scrollTop = log.scrollHeight;
 }
 // Логика управления левым сайдбаром сетевой сессии и экранами
-document.addEventListener('DOMContentLoaded', () => {
-  const sidebar = document.getElementById('left-network-sidebar');
-  const openBtn = document.getElementById('open-network-btn');
-  const closeBtn = document.getElementById('close-network-btn');
-  const roleButtons = document.querySelectorAll('.role-btn');
-  const playerNameGroup = document.querySelector('.id-player-only');
-  
-  // Новые элементы для переключения экранов
-  const connectBtn = document.getElementById('net-connect-btn');
-  const netStatus = document.getElementById('net-status');
-  const charHeader = document.querySelector('.char-header');
-  const leftSection = document.querySelector('.left-section');
-  const centerCol = document.querySelector('.center-col');
-  const rightCol = document.querySelector('.right-col');
-  const dmScreen = document.getElementById('dm-screen-root');
-
-  // Текущая выбранная роль (по умолчанию "player")
-  let currentRole = 'player';
-
-  // Открытие сайдбара
-  if (openBtn && sidebar) {
-    openBtn.addEventListener('click', () => {
-      sidebar.classList.add('is-open');
-    });
-  }
-
-  // Закрытие сайдбара
-  if (closeBtn && sidebar) {
-    closeBtn.addEventListener('click', () => {
-      sidebar.classList.remove('is-open');
-    });
-  }
-
-// Логика управления левым сайдбаром сетевой сессии и экранами
 const netSidebar = document.getElementById('left-network-sidebar');
 const netOpenBtn = document.getElementById('open-network-btn');
 const netCloseBtn = document.getElementById('close-network-btn');
@@ -1528,7 +1494,7 @@ if (netConnectBtn) {
       if (screenRoot) screenRoot.classList.add('dm-mode-active');
       if (dmScreen) dmScreen.style.display = 'block';
 
-      // НАПОЛНЕНИЕ ТЕСТОВЫМИ ИГРОКАМИ ДЛЯ ПРОВЕРКИ UI
+      // ПАНЕЛЬ ПАРТИИ (Тестовые карточки)
       const partyListContainer = document.getElementById('dm-party-list');
       if (partyListContainer) {
         const testPlayers = [
