@@ -1655,5 +1655,6 @@ if (searchInput) {
 
     const foundMonster = monsterCompendium.find(m => m.name.toLowerCase().includes(query));
     displayMonster(foundMonster);
-  });
-}
+    });
+  }
+});
