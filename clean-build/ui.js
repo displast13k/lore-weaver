@@ -1773,4 +1773,4 @@ if (netConnectBtn) {
     }
   }, 2000);
 
-}); // Закрывает глобальный DOMContentLoaded со 2-й строки ui.js
+//}); // Закрывает глобальный DOMContentLoaded со 2-й строки ui.js
