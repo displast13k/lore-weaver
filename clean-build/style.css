@@ -4095,3 +4095,10 @@ body::before {
   background: #2a0808;
   box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
 }
+/* Когда активирован режим мастера, скрываем стандартные блоки чарлиста */
+.screen-root.dm-mode-active .char-header,
+.screen-root.dm-mode-active .left-section,
+.screen-root.dm-mode-active .center-col,
+.screen-root.dm-mode-active .right-col {
+  display: none !important;
+}
