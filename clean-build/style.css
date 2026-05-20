@@ -4120,12 +4120,11 @@ body::before {
 .dm-screen-container {
   position: fixed !important;
   top: 0 !important;
-  /* Намертво привязываем левый край к сетевой панели (320px) */
+  /* Левый край намертво зафиксирован — тут всё супер */
   left: 320px !important; 
-  /* Высчитываем чистую ширину: 100% экрана минус 320px слева и 360px справа */
-  width: calc(100vw - 680px) !important; 
+  /* Увеличиваем вычитаемую ширину, чтобы аккуратно отодвинуть правый край от сайдбара */
+  width: calc(100vw - 720px) !important; 
   height: 100vh !important;
-  /* Внутренние отступы, чтобы контент не лип к краям */
   padding: 40px 20px 40px 20px !important; 
   box-sizing: border-box !important;
   z-index: 100 !important;
