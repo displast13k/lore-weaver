@@ -4105,30 +4105,30 @@ body::before {
 /* ==========================================================================
    ОБНОВЛЕННЫЙ ЭКРАН ГМА (МОНУМЕНТАЛЬНЫЙ GRID-РЕЖИМ)
    ========================================================================== */
-
-/* Базовый контейнер экрана ГМа */
-.dm-screen-container .dm-grid {
-  display: grid !important;
-  /* Уменьшаем правую колонку до 320px, чтобы она гарантированно влезла в зеленую область */
-  grid-template-columns: 1fr 320px !important; 
-  grid-template-rows: 1fr 280px !important;    
-  gap: 20px !important; /* Чуть уменьшим зазор, чтобы сэкономить место */
+/* Базовый контейнер экрана ГМа (встраивается прямо в сетку страницы) */
+.dm-screen-container {
+  /* Занимает всю ширину и высоту центральной рабочей области */
+  grid-column: span 2 !important; 
   width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
   max-width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+  padding: 10px 0 0 0 !important; /* Небольшой отступ сверху */
+  z-index: 10 !important;
+  background: transparent !important;
 }
 
-/* Мощная трехсекционная Grid-сетка */
+/* Идеальная внутренняя сетка панелей мастера */
 .dm-screen-container .dm-grid {
   display: grid !important;
-  grid-template-columns: 1fr 420px !important; /* Четко делим экран: партия слева, инициатива справа */
-  grid-template-rows: 1fr 280px !important;    /* Справочник снизу */
-  gap: 25px !important;
+  /* Левая панель тянется, правая (инициатива) всегда занимает аккуратные 360px */
+  grid-template-columns: 1fr 360px !important; 
+  /* Верхняя строка с панелями забирает все место, справочник снизу — фиксирован */
+  grid-template-rows: 1fr 280px !important; 
+  gap: 20px !important;
   width: 100% !important;
   height: 100% !important;
   margin: 0 !important;
-  max-width: 100% !important;
 }
 
 .dm-screen-container .dm-party-panel {
