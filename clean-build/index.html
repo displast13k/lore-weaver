@@ -8,6 +8,27 @@
 </head>
 <body>
     <div class="screen-root">
+  <div id="left-network-sidebar" class="network-sidebar">
+    <button id="close-network-btn" class="close-btn">×</button>
+    <div class="sidebar-section">
+      <h3>СЕТЕВАЯ СЕССИЯ</h3>
+      <div class="role-selector">
+        <button class="role-btn active" data-role="player">Игрок</button>
+        <button class="role-btn" data-role="dm">ГМ (Мастер)</button>
+      </div>
+      <div class="input-group">
+        <label>ID Комнаты (Party ID)</label>
+        <input type="text" id="net-room-id" placeholder="Например: party-777">
+      </div>
+      <div class="input-group id-player-only">
+        <label>Имя персонажа / Ник</label>
+        <input type="text" id="net-player-name" placeholder="Имя в сессии">
+      </div>
+      <button id="net-connect-btn" class="connect-main-btn">ПОДКЛЮЧИТЬСЯ</button>
+    </div>
+    <div id="net-status" class="net-status offline">Статус: Отключен</div>
+  </div>
+  <button id="open-network-btn" class="floating-net-btn">🌐</button>
 
         <!-- ===== HEADER ROW ===== --> 
 
