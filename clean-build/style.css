@@ -4108,24 +4108,28 @@ body::before {
 
 /* Базовый контейнер экрана ГМа */
 .dm-screen-container {
-  position: absolute !important;
+  position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   width: 100vw !important;
   height: 100vh !important;
-  padding: 80px 40px 40px 40px !important; /* Отступ сверху для кнопки глобуса */
+  padding: 80px 40px 40px 40px !important;
   box-sizing: border-box !important;
-  z-index: 100 !important; /* Поднимаем над фоновым артом */
+  z-index: 100 !important;
+  background: transparent !important;
 }
+
 
 /* Мощная трехсекционная Grid-сетка */
 .dm-screen-container .dm-grid {
   display: grid !important;
-  grid-template-columns: 1fr 420px !important; /* Партия слева широкая, инициатива справа фиксирована */
+  grid-template-columns: 1fr 420px !important; /* Четко делим экран: партия слева, инициатива справа */
   grid-template-rows: 1fr 280px !important;    /* Справочник снизу */
   gap: 25px !important;
   width: 100% !important;
   height: 100% !important;
+  margin: 0 !important;
+  max-width: 100% !important;
 }
 
 .dm-screen-container .dm-party-panel {
