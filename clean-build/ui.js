@@ -1447,6 +1447,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+// Логика управления левым сайдбаром сетевой сессии и экранами
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('left-network-sidebar');
+  const openBtn = document.getElementById('open-network-btn');
+  const closeBtn = document.getElementById('close-network-btn');
+  const roleButtons = document.querySelectorAll('.role-btn');
+  const playerNameGroup = document.querySelector('.id-player-only');
+  
+  // Новые элементы для переключения экранов
+  const connectBtn = document.getElementById('net-connect-btn');
+  const netStatus = document.getElementById('net-status');
+  const charHeader = document.querySelector('.char-header');
+  const leftSection = document.querySelector('.left-section');
+  const centerCol = document.querySelector('.center-col');
+  const rightCol = document.querySelector('.right-col');
+  const dmScreen = document.getElementById('dm-screen-root');
+
+  // Текущая выбранная роль (по умолчанию "player")
+  let currentRole = 'player';
+
+  // Открытие сайдбара
+  if (openBtn && sidebar) {
+    openBtn.addEventListener('click', () => {
+      sidebar.classList.add('is-open');
+    });
+  }
+
+  // Закрытие сайдбара
+  if (closeBtn && sidebar) {
+    closeBtn.addEventListener('click', () => {
+      sidebar.classList.remove('is-open');
+    });
+  }
+
   // Переключение ролей (Игрок / ГМ) внутри сайдбара
   roleButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1465,7 +1499,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ОБРАБОТКА КЛИКА ПО КНОПКЕ "ПОДКЛЮЧИТЬСЯ"
- if (connectBtn) {
+  if (connectBtn) {
     connectBtn.addEventListener('click', () => {
       const roomId = document.getElementById('net-room-id').value.trim();
       const playerName = document.getElementById('net-player-name')?.value.trim();
@@ -1495,6 +1529,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (screenRoot) screenRoot.classList.add('dm-mode-active');
         if (dmScreen) dmScreen.style.display = 'block';
 
+        // НАПОЛНЕНИЕ ТЕСТОВЫМИ ИГРОКАМИ ДЛЯ ПРОВЕРКИ UI
         const partyListContainer = document.getElementById('dm-party-list');
         if (partyListContainer) {
           const testPlayers = [
@@ -1546,7 +1581,9 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`Вы подключились к комнате ${roomId} как игрок ${playerName}!`);
       }
     });
-       // ====== ТРЕКЕР ИНИЦИАТИВЫ ГМА ======
+  }
+
+  // ====== ТРЕКЕР ИНИЦИАТИВЫ ГМА ======
   const initBtn = document.querySelector('.dm-initiative-panel .dm-btn-small:nth-child(1)');
   const resetInitBtn = document.querySelector('.dm-initiative-panel .dm-btn-small:nth-child(2)');
   const initiativeList = document.getElementById('dm-initiative-list');
@@ -1559,7 +1596,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { name: "Лира Светоносная", type: "player", initiative: Math.floor(Math.random() * 20) + 1 + 1, hp: 12, maxHp: 43 },
         { name: "Гоблин-Застрельщик А", type: "enemy", initiative: Math.floor(Math.random() * 20) + 1 + 2, hp: 7, maxHp: 7 },
         { name: "Гоблин-Застрельщик Б", type: "enemy", initiative: Math.floor(Math.random() * 20) + 1 + 2, hp: 7, maxHp: 7 }
-      ]
+      ];
 
       combatants.sort((a, b) => b.initiative - a.initiative);
 
@@ -1598,63 +1635,64 @@ document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.querySelector('.dm-search-input');
   const compendiumBody = document.querySelector('.dm-compendium-panel .dm-card-body');
 
-const displayMonster = (monster) => {
-  const resultContainer = document.getElementById('dm-compendium-results') || document.createElement('div');
-  resultContainer.id = 'dm-compendium-results';
-  resultContainer.style.marginTop = '15px';
+  const displayMonster = (monster) => {
+    const resultContainer = document.getElementById('dm-compendium-results') || document.createElement('div');
+    resultContainer.id = 'dm-compendium-results';
+    resultContainer.style.marginTop = '15px';
 
-  if (!monster) {
-    resultContainer.innerHTML = '<div class="dm-empty-placeholder">Существо не найдено в бестиарии</div>';
-    if (!document.getElementById('dm-compendium-results')) compendiumBody.appendChild(resultContainer);
-    return;
-  }
-
-  let statsHTML = '<div style="display: flex; gap: 10px; margin: 10px 0; background: #150404; padding: 8px; border-radius: 4px; border: 1px solid #2d0b0b;">';
-  for (const [key, value] of Object.entries(monster.stats)) {
-    statsHTML += `<div style="text-align: center; flex: 1;"><span style="font-size: 10px; color: #888; display: block;">${key}</span><span style="font-size: 13px; color: #ff3333; font-weight: bold;">${value}</span></div>`;
-  }
-  statsHTML += '</div>';
-
-  let actionsHTML = '<div style="margin-top: 10px;">';
-  monster.actions.forEach(act => {
-    actionsHTML += `<p style="margin: 4px 0; font-size: 13px;"><strong style="color: #ff3333;">${act.name}:</strong> <span style="color: #bbb;">${act.desc}</span></p>`;
-  });
-  actionsHTML += '</div>';
-
-  resultContainer.innerHTML = `
-    <div style="border-top: 1px solid #4a1111; padding-top: 15px;">
-      <h4 style="margin: 0; color: #fff; font-size: 18px;">${monster.name}</h4>
-      <span style="font-size: 11px; color: #888; font-style: italic;">${monster.size}</span>
-      
-      <div style="display: flex; gap: 20px; margin-top: 10px; font-size: 13px; color: #aaa;">
-        <span><strong>КД:</strong> <span style="color: #ff3333; font-weight: bold;">${monster.ac}</span></span>
-        <span><strong>ХП:</strong> <span style="color: #00ff66;">${monster.hp}</span></span>
-        <span><strong>Скорость:</strong> ${monster.speed}</span>
-      </div>
-
-      \${statsHTML}
-      <h5 style="margin: 10px 0 5px 0; color: #ff3333; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Действия</h5>
-      \${actionsHTML}
-    </div>
-  `;
-
-  if (!document.getElementById('dm-compendium-results')) {
-    compendiumBody.appendChild(resultContainer);
-  }
-};
-
-if (searchInput) {
-  searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.trim().toLowerCase();
-
-    if (!query) {
-      const res = document.getElementById('dm-compendium-results');
-      if (res) res.innerHTML = '';
+    if (!monster) {
+      resultContainer.innerHTML = '<div class="dm-empty-placeholder">Существо не найдено в бестиарии</div>';
+      if (!document.getElementById('dm-compendium-results')) compendiumBody.appendChild(resultContainer);
       return;
     }
 
-    const foundMonster = monsterCompendium.find(m => m.name.toLowerCase().includes(query));
-    displayMonster(foundMonster);
+    let statsHTML = '<div style="display: flex; gap: 10px; margin: 10px 0; background: #150404; padding: 8px; border-radius: 4px; border: 1px solid #2d0b0b;">';
+    for (const [key, value] of Object.entries(monster.stats)) {
+      statsHTML += `<div style="text-align: center; flex: 1;"><span style="font-size: 10px; color: #888; display: block;">\${key}</span><span style="font-size: 13px; color: #ff3333; font-weight: bold;">\${value}</span></div>`;
+    }
+    statsHTML += '</div>';
+
+    let actionsHTML = '<div style="margin-top: 10px;">';
+    monster.actions.forEach(act => {
+      actionsHTML += `<p style="margin: 4px 0; font-size: 13px;"><strong style="color: #ff3333;">\${act.name}:</strong> <span style="color: #bbb;">\${act.desc}</span></p>`;
+    });
+    actionsHTML += '</div>';
+
+    resultContainer.innerHTML = `
+      <div style="border-top: 1px solid #4a1111; padding-top: 15px;">
+        <h4 style="margin: 0; color: #fff; font-size: 18px;">\${monster.name}</h4>
+        <span style="font-size: 11px; color: #888; font-style: italic;">\${monster.size}</span>
+        
+        <div style="display: flex; gap: 20px; margin-top: 10px; font-size: 13px; color: #aaa;">
+          <span><strong>КД:</strong> <span style="color: #ff3333; font-weight: bold;">\${monster.ac}</span></span>
+          <span><strong>ХП:</strong> <span style="color: #00ff66;">\${monster.hp}</span></span>
+          <span><strong>Скорость:</strong> \${monster.speed}</span>
+        </div>
+
+        \${statsHTML}
+        <h5 style="margin: 10px 0 5px 0; color: #ff3333; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Действия</h5>
+        \${actionsHTML}
+      </div>
+    `;
+
+    if (!document.getElementById('dm-compendium-results')) {
+      compendiumBody.appendChild(resultContainer);
+    }
+  };
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim().toLowerCase();
+
+      if (!query) {
+        const res = document.getElementById('dm-compendium-results');
+        if (res) res.innerHTML = '';
+        return;
+      }
+
+      const foundMonster = monsterCompendium.find(m => m.name.toLowerCase().includes(query));
+      displayMonster(foundMonster);
     });
   }
-}
+
+}); // Финальное закрытие DOMContentLoaded
