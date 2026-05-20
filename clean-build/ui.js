@@ -1641,7 +1641,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!document.getElementById('dm-compendium-results')) {
       compendiumBody.appendChild(resultContainer);
     }
-  };
 
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
@@ -1657,5 +1656,4 @@ document.addEventListener('DOMContentLoaded', () => {
       displayMonster(foundMonster);
     });
   }
-
-}); // ЭТА СКОБКА НА САМОЙ ПОСЛЕДНЕЙ СТРОКЕ ЗАКРЫВАЕТ ВСЁ СОБЫТИЕ DOMContentLoaded
+});
