@@ -1657,4 +1657,4 @@ if (searchInput) {
     displayMonster(foundMonster);
     });
   }
-});
+}
