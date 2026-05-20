@@ -1540,18 +1540,18 @@ if (netConnectBtn) {
           });
         }
 
-      } else {
-        if (screenRoot) screenRoot.classList.remove('dm-mode-active');
-        if (dmScreen) dmScreen.style.display = 'none';
-        
-        // Симулятор сети: Игрок сохраняет данные в локальную память браузера
-        localStorage.setItem('connected_player_name', playerName);
-        localStorage.setItem('connected_room_id', roomId);
-        
-        alert(`Вы подключились к комнате ${roomId} как игрок ${playerName}!`);
-      }
-    });
-  }
+    } else {
+      if (screenRoot) screenRoot.classList.remove('dm-mode-active');
+      if (dmScreen) dmScreen.style.display = 'none';
+      
+      // Симулятор сети: Игрок сохраняет данные в локальную память браузера
+      localStorage.setItem('connected_player_name', playerName);
+      localStorage.setItem('connected_room_id', roomId);
+      
+      alert(`Вы подключились к комнате ${roomId} как игрок ${playerName}!`);
+    }
+  });
+
 
 // ====== ТРЕКЕР ИНИЦИАТИВЫ ГМА ======
   const initBtn = document.querySelector('.dm-initiative-panel .dm-btn-small:nth-child(1)');
