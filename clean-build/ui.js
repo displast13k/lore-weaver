@@ -1448,7 +1448,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 // Логика управления левым сайдбаром сетевой сессии и экранами
-document.addEventListener('DOMContentLoaded', () => {
   const sidebar = document.getElementById('left-network-sidebar');
   const openBtn = document.getElementById('open-network-btn');
   const closeBtn = document.getElementById('close-network-btn');
@@ -1694,5 +1693,4 @@ document.addEventListener('DOMContentLoaded', () => {
       displayMonster(foundMonster);
     });
   }
-
-}); // Финальное закрытие DOMContentLoaded
+}
