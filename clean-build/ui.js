@@ -1465,10 +1465,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ОБРАБОТКА КЛИКА ПО КНОПКЕ "ПОДКЛЮЧИТЬСЯ"
-  if (connectBtn) {
+ if (connectBtn) {
     connectBtn.addEventListener('click', () => {
       const roomId = document.getElementById('net-room-id').value.trim();
       const playerName = document.getElementById('net-player-name')?.value.trim();
+      const screenRoot = document.querySelector('.screen-root');
 
       if (!roomId) {
         alert('Пожалуйста, введите ID Комнаты!');
@@ -1480,7 +1481,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Имитируем успешное подключение (пока без Firebase бэкенда)
+      // Имитируем успешное подключение
       if (netStatus) {
         netStatus.textContent = `Статус: Подключен к ${roomId}`;
         netStatus.className = 'net-status online';
@@ -1489,26 +1490,15 @@ document.addEventListener('DOMContentLoaded', () => {
       // Закрываем шторку сессии после подключения
       if (sidebar) sidebar.classList.remove('is-open');
 
-      // ЛОГИКА СМЕНЫ ЭКРАНОВ
+      // ИЗЯЩНАЯ СМЕНА ЭКРАНОВ ЧЕРЕЗ КЛАССЫ
       if (currentRole === 'dm') {
-        // Если зашел ГМ: скрываем весь лист персонажа
-        if (charHeader) charHeader.style.display = 'none';
-        if (leftSection) leftSection.style.display = 'none';
-        if (centerCol) centerCol.style.display = 'none';
-        if (rightCol) rightCol.style.display = 'none';
-
-        // И показываем панель ГМа
+        if (screenRoot) screenRoot.classList.add('dm-mode-active');
         if (dmScreen) dmScreen.style.display = 'block';
       } else {
-        // Если зашел обычный Игрок: возвращаем стандартный лист персонажа
-        if (charHeader) charHeader.style.display = 'grid';
-        if (leftSection) leftSection.style.display = 'flex';
-        if (centerCol) centerCol.style.display = 'block';
-        
-        // Экран ГМа прячем
+        if (screenRoot) screenRoot.classList.remove('dm-mode-active');
         if (dmScreen) dmScreen.style.display = 'none';
         
-        alert(`Вы подключились к комнате ${roomId} как игрок ${playerName}! Ваша статистика скоро будет передана мастеру.`);
+        alert(`Вы подключились к комнате ${roomId} как игрок ${playerName}!`);
       }
     });
   }
