@@ -1641,6 +1641,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!document.getElementById('dm-compendium-results')) {
       compendiumBody.appendChild(resultContainer);
     }
+  }; // <-- СЮДА ВЕРНУЛАСЬ СКОБКА, ЗАКРЫВАЮЩАЯ DISPLAYMONSTER!
 
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
@@ -1656,4 +1657,3 @@ document.addEventListener('DOMContentLoaded', () => {
       displayMonster(foundMonster);
     });
   }
-}
