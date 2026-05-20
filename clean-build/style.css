@@ -4110,12 +4110,13 @@ body::before {
 .dm-screen-container {
   position: fixed !important;
   top: 0 !important;
-  /* Левая граница зафиксирована (320px) — тут всё супер */
+  /* Жестко привязываем к краю левого сайдбара */
   left: 320px !important; 
-  /* Вычитаем 320px слева + ~400px под правый сайдбар с отступом */
-  width: calc(100vw - 720px) !important; 
+  /* Заставляем его занимать всю оставшуюся ширину экрана */
+  width: calc(100vw - 320px) !important; 
   height: 100vh !important;
-  padding: 40px 20px 40px 20px !important; 
+  /* Отступы: справа делаем чуть больше (40px), чтобы сетка не прижималась к самому краю экрана */
+  padding: 40px 40px 40px 20px !important; 
   box-sizing: border-box !important;
   z-index: 100 !important;
   background: transparent !important;
