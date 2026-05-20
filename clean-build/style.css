@@ -4107,20 +4107,16 @@ body::before {
    ========================================================================== */
 
 /* Базовый контейнер экрана ГМа */
-.dm-screen-container {
-  position: fixed !important;
-  top: 0 !important;
-  /* Намертво прижимаем левый край к сетевой панели */
-  left: 320px !important; 
-  /* Вычитаем ровно 320px слева и 350px справа. Экран ГМа займет ВСЁ свободное пространство между ними */
-  width: calc(100vw - 670px) !important; 
-  height: 100vh !important;
-  /* Отступы внутри самого экрана ГМа, чтобы контент не лип к рамкам */
-  padding: 40px 20px 40px 20px !important; 
-  box-sizing: border-box !important;
-  z-index: 100 !important;
-  background: transparent !important;
-  overflow: hidden !important;
+.dm-screen-container .dm-grid {
+  display: grid !important;
+  /* Уменьшаем правую колонку до 320px, чтобы она гарантированно влезла в зеленую область */
+  grid-template-columns: 1fr 320px !important; 
+  grid-template-rows: 1fr 280px !important;    
+  gap: 20px !important; /* Чуть уменьшим зазор, чтобы сэкономить место */
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  max-width: 100% !important;
 }
 
 /* Мощная трехсекционная Grid-сетка */
