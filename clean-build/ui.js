@@ -1413,3 +1413,40 @@ function addLogHTML(html) {
     log.appendChild(entry);
     log.scrollTop = log.scrollHeight;
 }
+// Логика управления левым сайдбаром сетевой сессии
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('left-network-sidebar');
+  const openBtn = document.getElementById('open-network-btn');
+  const closeBtn = document.getElementById('close-network-btn');
+  const roleButtons = document.querySelectorAll('.role-btn');
+  const playerNameGroup = document.querySelector('.id-player-only');
+
+  // Открытие сайдбара
+  if (openBtn && sidebar) {
+    openBtn.addEventListener('click', () => {
+      sidebar.classList.add('is-open');
+    });
+  }
+
+  // Закрытие сайдбара
+  if (closeBtn && sidebar) {
+    closeBtn.addEventListener('click', () => {
+      sidebar.classList.remove('is-open');
+    });
+  }
+
+  // Переключение ролей (Игрок / ГМ) внутри сайдбара
+  roleButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      roleButtons.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Если выбран ГМ — скрываем поле ввода имени персонажа, ГМу оно не нужно
+      if (btn.getAttribute('data-role') === 'dm') {
+        if (playerNameGroup) playerNameGroup.style.display = 'none';
+      } else {
+        if (playerNameGroup) playerNameGroup.style.display = 'flex';
+      }
+    });
+  });
+});
