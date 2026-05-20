@@ -4110,19 +4110,18 @@ body::before {
 .dm-screen-container {
   position: fixed !important;
   top: 0 !important;
-  /* Жестко привязываем к краю левого сайдбара */
+  /* Намертво прижимаем левый край к сетевой панели */
   left: 320px !important; 
-  /* Заставляем его занимать всю оставшуюся ширину экрана */
-  width: calc(100vw - 320px) !important; 
+  /* Вычитаем ровно 320px слева и 350px справа. Экран ГМа займет ВСЁ свободное пространство между ними */
+  width: calc(100vw - 670px) !important; 
   height: 100vh !important;
-  /* Отступы: справа делаем чуть больше (40px), чтобы сетка не прижималась к самому краю экрана */
-  padding: 40px 40px 40px 20px !important; 
+  /* Отступы внутри самого экрана ГМа, чтобы контент не лип к рамкам */
+  padding: 40px 20px 40px 20px !important; 
   box-sizing: border-box !important;
   z-index: 100 !important;
   background: transparent !important;
   overflow: hidden !important;
 }
-
 
 /* Мощная трехсекционная Grid-сетка */
 .dm-screen-container .dm-grid {
