@@ -30,6 +30,37 @@
   </div>
   <button id="open-network-btn" class="floating-net-btn">🌐</button>
 
+         <!-- ЭКРАН ГМА (Скрыт по умолчанию) -->
+  <div id="dm-screen-root" class="dm-screen-container" style="display: none;">
+    <div class="dm-grid">
+      
+      <div class="dm-card dm-party-panel">
+        <div class="dm-card-header">👥 ПАНЕЛЬ ПАРТИИ</div>
+        <div id="dm-party-list" class="dm-card-body">
+          <div class="dm-empty-placeholder">Ожидание подключения игроков...</div>
+        </div>
+      </div>
+
+      <div class="dm-card dm-initiative-panel">
+        <div class="dm-card-header">⚔️ ИНИЦИАТИВА</div>
+        <div class="dm-card-body">
+          <div class="encounter-controls">
+            <button class="dm-btn-small">Начать бой</button>
+            <button class="dm-btn-small">Сброс</button>
+          </div>
+          <div id="dm-initiative-list" class="initiative-list"></div>
+        </div>
+      </div>
+
+      <div class="dm-card dm-compendium-panel">
+        <div class="dm-card-header">📖 СПРАВОЧНИК И ЗАМЕТКИ</div>
+        <div class="dm-card-body">
+          <input type="text" class="dm-search-input" placeholder="Поиск монстров или заклинаний...">
+        </div>
+      </div>
+
+    </div>
+  </div>
         <!-- ===== HEADER ROW ===== --> 
 
         <div class="char-header">
