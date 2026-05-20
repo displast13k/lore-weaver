@@ -1546,5 +1546,52 @@ document.addEventListener('DOMContentLoaded', () => {
         alert(`Вы подключились к комнате ${roomId} как игрок ${playerName}!`);
       }
     });
+       // ====== ТРЕКЕР ИНИЦИАТИВЫ ГМА ======
+  const initBtn = document.querySelector('.dm-initiative-panel .dm-btn-small:nth-child(1)');
+  const resetInitBtn = document.querySelector('.dm-initiative-panel .dm-btn-small:nth-child(2)');
+  const initiativeList = document.getElementById('dm-initiative-list');
+
+  if (initBtn) {
+    initBtn.addEventListener('click', () => {
+      let combatants = [
+        { name: "Торгар Железный", type: "player", initiative: Math.floor(Math.random() * 20) + 1 + 2, hp: 58, maxHp: 65 },
+        { name: "Варис Тень", type: "player", initiative: Math.floor(Math.random() * 20) + 1 + 4, hp: 34, maxHp: 39 },
+        { name: "Лира Светоносная", type: "player", initiative: Math.floor(Math.random() * 20) + 1 + 1, hp: 12, maxHp: 43 },
+        { name: "Гоблин-Застрельщик А", type: "enemy", initiative: Math.floor(Math.random() * 20) + 1 + 2, hp: 7, maxHp: 7 },
+        { name: "Гоблин-Застрельщик Б", type: "enemy", initiative: Math.floor(Math.random() * 20) + 1 + 2, hp: 7, maxHp: 7 }
+      ]
+
+      combatants.sort((a, b) => b.initiative - a.initiative);
+
+      if (initiativeList) {
+        initiativeList.innerHTML = '';
+
+        combatants.forEach((unit, index) => {
+          const activeClass = index === 0 ? 'active-turn' : '';
+          const unitColor = unit.type === 'enemy' ? '#ff3333' : '#00ff66';
+
+          const rowHTML = `
+            <div class="init-row ${activeClass}" style="border-left: 3px solid ${unitColor}; margin-bottom: 8px; background: #1a0505; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; flex-direction: column;">
+                <span style="color: #fff; font-weight: bold; font-size: 14px;">[${unit.initiative}] ${unit.name}</span>
+                <span style="color: #888; font-size: 11px;">ХП: ${unit.hp}/${unit.maxHp}</span>
+              </div>
+              <div style="display: flex; gap: 5px;">
+                <button class="dm-btn-small" style="padding: 2px 6px; font-size: 11px; margin: 0;">- ХП</button>
+                <button class="dm-btn-small" style="padding: 2px 6px; font-size: 11px; margin: 0; border-color: #00aa44;">+ ХП</button>
+              </div>
+            </div>
+          `;
+          initiativeList.insertAdjacentHTML('beforeend', rowHTML);
+        });
+      }
+    });
+  }
+
+  if (resetInitBtn && initiativeList) {
+    resetInitBtn.addEventListener('click', () => {
+      initiativeList.innerHTML = '<div class="dm-empty-placeholder">Бой не начат</div>';
+    });
+  }
   }
 });
