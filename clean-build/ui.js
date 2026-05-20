@@ -1448,14 +1448,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
 // Логика управления левым сайдбаром сетевой сессии и экранами
-const networkSidebar = document.getElementById('left-network-sidebar');
-const openBtn = document.getElementById('open-network-btn');
-const closeBtn = document.getElementById('close-network-btn');
-const roleButtons = document.querySelectorAll('.role-btn');
-const playerNameGroup = document.querySelector('.id-player-only');
+const netSidebar = document.getElementById('left-network-sidebar');
+const netOpenBtn = document.getElementById('open-network-btn');
+const netCloseBtn = document.getElementById('close-network-btn');
+const netRoleButtons = document.querySelectorAll('.role-btn');
+const netPlayerNameGroup = document.querySelector('.id-player-only');
 
 // Новые элементы для переключения экранов
-const connectBtn = document.getElementById('net-connect-btn');
+const netConnectBtn = document.getElementById('net-connect-btn');
 const netStatus = document.getElementById('net-status');
 const charHeader = document.querySelector('.char-header');
 const leftSection = document.querySelector('.left-section');
@@ -1467,39 +1467,39 @@ const dmScreen = document.getElementById('dm-screen-root');
 let currentRole = 'player';
 
 // Открытие сайдбара
-if (openBtn && networkSidebar) {
-  openBtn.addEventListener('click', () => {
-    networkSidebar.classList.add('is-open');
+if (netOpenBtn && netSidebar) {
+  netOpenBtn.addEventListener('click', () => {
+    netSidebar.classList.add('is-open');
   });
 }
 
 // Закрытие сайдбара
-if (closeBtn && networkSidebar) {
-  closeBtn.addEventListener('click', () => {
-    networkSidebar.classList.remove('is-open');
+if (netCloseBtn && netSidebar) {
+  netCloseBtn.addEventListener('click', () => {
+    netSidebar.classList.remove('is-open');
   });
 }
 
 // Переключение ролей (Игрок / ГМ) внутри сайдбара
-roleButtons.forEach(btn => {
+netRoleButtons.forEach(btn => {
   btn.addEventListener('click', () => {
-    roleButtons.forEach(b => b.classList.remove('active'));
+    netRoleButtons.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 
     currentRole = btn.getAttribute('data-role');
 
     // Если выбран ГМ — скрываем поле ввода имени персонажа, ГМу оно не нужно
     if (currentRole === 'dm') {
-      if (playerNameGroup) playerNameGroup.style.display = 'none';
+      if (netPlayerNameGroup) netPlayerNameGroup.style.display = 'none';
     } else {
-      if (playerNameGroup) playerNameGroup.style.display = 'flex';
+      if (netPlayerNameGroup) netPlayerNameGroup.style.display = 'flex';
     }
   });
 });
 
 // ОБРАБОТКА КЛИКА ПО КНОПКЕ "ПОДКЛЮЧИТЬСЯ"
-if (connectBtn) {
-  connectBtn.addEventListener('click', () => {
+if (netConnectBtn) {
+  netConnectBtn.addEventListener('click', () => {
     const roomId = document.getElementById('net-room-id').value.trim();
     const playerName = document.getElementById('net-player-name')?.value.trim();
     const screenRoot = document.querySelector('.screen-root');
@@ -1521,7 +1521,7 @@ if (connectBtn) {
     }
 
     // Закрываем шторку сессии после подключения
-    if (networkSidebar) networkSidebar.classList.remove('is-open');
+    if (netSidebar) netSidebar.classList.remove('is-open');
 
     // ИЗЯЩНАЯ СМЕНА ЭКРАНОВ ЧЕРЕЗ КЛАССЫ
     if (currentRole === 'dm') {
