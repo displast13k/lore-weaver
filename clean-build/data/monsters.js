@@ -1,6 +1,6 @@
 // monsters.js - Изолированная база данных бестиария
 
-export const monsterCompendium = [
+const monsterCompendium = [
   {
     id: "goblin",
     name: "Гоблин",
