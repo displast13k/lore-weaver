@@ -3936,3 +3936,162 @@ body::before {
     right: 0;
   }
 }
+/* Левый сайдбар сетевой сессии */
+.network-sidebar {
+  position: fixed;
+  top: 0;
+  left: -320px; /* Скрыт по умолчанию за левым краем */
+  width: 320px;
+  height: 100vh;
+  background: #110303; 
+  border-right: 2px solid #3a1111;
+  z-index: 2000;
+  transition: left 0.3s ease;
+  padding: 25px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Класс для открытия сайдбара из JS */
+.network-sidebar.is-open {
+  left: 0;
+}
+
+/* Кнопка закрытия (крестик) */
+.network-sidebar .close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.network-sidebar .close-btn:hover {
+  color: #ff3333;
+}
+
+/* Заголовок панели */
+.sidebar-section h3 {
+  color: #ff3333;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-family: inherit;
+  letter-spacing: 1px;
+}
+
+/* Переключатель ролей (Игрок / ГМ) */
+.role-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.role-btn {
+  background: #1a0505;
+  border: 1px solid #3a1111;
+  color: #888;
+  padding: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.role-btn.active {
+  background: #4a1111;
+  border-color: #ff3333;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.2);
+}
+
+/* Поля ввода и подписи */
+.input-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input-group label {
+  color: #aaa;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.input-group input {
+  width: 100%;
+  background: #1a0505;
+  border: 1px solid #3a1111;
+  color: #fff;
+  padding: 10px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: #ff3333;
+}
+
+/* Главная кнопка подключения */
+.connect-main-btn {
+  width: 100%;
+  background: #2a0808;
+  color: #fff;
+  border: 1px solid #4a1111;
+  padding: 14px;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+
+.connect-main-btn:hover {
+  background: #4a1111;
+  border-color: #ff3333;
+  box-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+}
+
+/* Статус подключения на дне панели */
+.net-status {
+  margin-top: auto;
+  padding: 10px;
+  text-align: center;
+  background: #1a0505;
+  border: 1px solid #3a1111;
+  font-size: 13px;
+}
+
+.net-status.offline { color: #888; }
+.net-status.online { color: #00ff66; border-color: #00aa44; }
+
+/* Плавающая кнопка вызова на основном экране */
+.floating-net-btn {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1400;
+  background: #1a0505;
+  border: 1px solid #3a1111;
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s;
+}
+
+.floating-net-btn:hover {
+  border-color: #ff3333;
+  background: #2a0808;
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+}
