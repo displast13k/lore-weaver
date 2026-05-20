@@ -1554,106 +1554,106 @@ if (netConnectBtn) {
   }
 
 // ====== ТРЕКЕР ИНИЦИАТИВЫ ГМА ======
-const initBtn = document.querySelector('.dm-initiative-panel .dm-btn-small:nth-child(1)');
-const resetInitBtn = document.querySelector('.dm-initiative-panel .dm-btn-small:nth-child(2)');
-const initiativeList = document.getElementById('dm-initiative-list');
+  const initBtn = document.querySelector('.dm-initiative-panel .dm-btn-small:nth-child(1)');
+  const resetInitBtn = document.querySelector('.dm-initiative-panel .dm-btn-small:nth-child(2)');
+  const initiativeList = document.getElementById('dm-initiative-list');
 
-// Глобальный массив для текущего боя
-let activeCombatants = [];
+  // Глобальный массив для текущего боя
+  let activeCombatants = [];
 
-// Функция для отрисовки списка инициативы
-const renderInitiativeList = () => {
-  if (!initiativeList) return;
-  
-  if (activeCombatants.length === 0) {
-    initiativeList.innerHTML = '<div class="dm-empty-placeholder">Бой не начат</div>';
-    return;
-  }
+  // Функция для отрисовки списка инициативы
+  const renderInitiativeList = () => {
+    if (!initiativeList) return;
+    
+    if (activeCombatants.length === 0) {
+      initiativeList.innerHTML = '<div class="dm-empty-placeholder">Бой не начат</div>';
+      return;
+    }
 
-  initiativeList.innerHTML = '';
+    initiativeList.innerHTML = '';
 
-  activeCombatants.forEach((unit, index) => {
-    const activeClass = index === 0 ? 'active-turn' : '';
-    const unitColor = unit.type === 'enemy' ? '#ff3333' : '#00ff66';
+    activeCombatants.forEach((unit, index) => {
+      const activeClass = index === 0 ? 'active-turn' : '';
+      const unitColor = unit.type === 'enemy' ? '#ff3333' : '#00ff66';
 
-    const rowHTML = `
-      <div class="init-row ${activeClass}" style="border-left: 3px solid ${unitColor}; margin-bottom: 8px; background: #1a0505; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
-        <div style="display: flex; flex-direction: column;">
-          <span style="color: #fff; font-weight: bold; font-size: 14px;">[${unit.initiative}] ${unit.name}</span>
-          <span style="color: #888; font-size: 11px;">ХП: ${unit.hp}</span>
+      const rowHTML = `
+        <div class="init-row ${activeClass}" style="border-left: 3px solid ${unitColor}; margin-bottom: 8px; background: #1a0505; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; flex-direction: column;">
+            <span style="color: #fff; font-weight: bold; font-size: 14px;">[${unit.initiative}] ${unit.name}</span>
+            <span style="color: #888; font-size: 11px;">ХП: ${unit.hp}</span>
+          </div>
+          <div style="display: flex; gap: 5px;">
+            <button class="dm-btn-small btn-hp-minus" data-index="${index}" style="padding: 2px 6px; font-size: 11px; margin: 0;">- ХП</button>
+            <button class="dm-btn-small btn-hp-plus" data-index="${index}" style="padding: 2px 6px; font-size: 11px; margin: 0; border-color: #00aa44;">+ ХП</button>
+          </div>
         </div>
-        <div style="display: flex; gap: 5px;">
-          <button class="dm-btn-small btn-hp-minus" data-index="${index}" style="padding: 2px 6px; font-size: 11px; margin: 0;">- ХП</button>
-          <button class="dm-btn-small btn-hp-plus" data-index="${index}" style="padding: 2px 6px; font-size: 11px; margin: 0; border-color: #00aa44;">+ ХП</button>
-        </div>
-      </div>
-    `;
-    initiativeList.insertAdjacentHTML('beforeend', rowHTML);
-  });
-
-  // Логика кнопок изменения ХП внутри инициативы
-  document.querySelectorAll('.btn-hp-minus').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const idx = e.target.getAttribute('data-index');
-      let hpVal = parseInt(activeCombatants[idx].hp);
-      if (!isNaN(hpVal)) {
-        activeCombatants[idx].hp = Math.max(0, hpVal - 5);
-        renderInitiativeList();
-      }
+      `;
+      initiativeList.insertAdjacentHTML('beforeend', rowHTML);
     });
-  });
 
-  document.querySelectorAll('.btn-hp-plus').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const idx = e.target.getAttribute('data-index');
-      let hpVal = parseInt(activeCombatants[idx].hp);
-      if (!isNaN(hpVal)) {
-        activeCombatants[idx].hp = hpVal + 5;
-        renderInitiativeList();
-      }
+    // Логика кнопок изменения ХП внутри инициативы
+    document.querySelectorAll('.btn-hp-minus').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = e.target.getAttribute('data-index');
+        let hpVal = parseInt(activeCombatants[idx].hp);
+        if (!isNaN(hpVal)) {
+          activeCombatants[idx].hp = Math.max(0, hpVal - 5);
+          renderInitiativeList();
+        }
+      });
     });
-  });
-};
 
-if (initBtn) {
-  initBtn.addEventListener('click', () => {
-    // При старте боя подтягиваем базовую партию
-    activeCombatants = [
-      { name: "Торгар Железный", type: "player", initiative: Math.floor(Math.random() * 20) + 1 + 2, hp: 58 },
-      { name: "Варис Тень", type: "player", initiative: Math.floor(Math.random() * 20) + 1 + 4, hp: 34 },
-      { name: "Лира Светоносная", type: "player", initiative: Math.floor(Math.random() * 20) + 1 + 1, hp: 12 }
-    ];
-
-    activeCombatants.sort((a, b) => b.initiative - a.initiative);
-    renderInitiativeList();
-  });
-}
-
-if (resetInitBtn) {
-  resetInitBtn.addEventListener('click', () => {
-    activeCombatants = [];
-    renderInitiativeList();
-  });
-}
-
-// Метод добавления монстров в бой (вызывается из справочника)
-window.addMonsterToInitiative = (monster) => {
-  const defaultHp = parseInt(monster.hp) || 10;
-  
-  const newEnemy = {
-    name: monster.name,
-    type: "enemy",
-    // Бросок d20 + Модификатор Ловкости монстра
-    initiative: Math.floor(Math.random() * 20) + 1 + Math.floor((monster.stats.ЛОВ - 10) / 2),
-    hp: defaultHp
+    document.querySelectorAll('.btn-hp-plus').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = e.target.getAttribute('data-index');
+        let hpVal = parseInt(activeCombatants[idx].hp);
+        if (!isNaN(hpVal)) {
+          activeCombatants[idx].hp = hpVal + 5;
+          renderInitiativeList();
+        }
+      });
+    });
   };
 
-  activeCombatants.push(newEnemy);
-  activeCombatants.sort((a, b) => b.initiative - a.initiative);
-  renderInitiativeList();
-};
+  if (initBtn) {
+    initBtn.addEventListener('click', () => {
+      // При старте боя подтягиваем базовую партию
+      activeCombatants = [
+        { name: "Торгар Железный", type: "player", initiative: Math.floor(Math.random() * 20) + 1 + 2, hp: 58 },
+        { name: "Варис Тень", type: "player", initiative: Math.floor(Math.random() * 20) + 1 + 4, hp: 34 },
+        { name: "Лира Светоносная", type: "player", initiative: Math.floor(Math.random() * 20) + 1 + 1, hp: 12 }
+      ];
 
-// ====== СЛУШАТЕЛЬ ЖИВОГО ПОИСКА В СПРАВОЧНИКЕ ======
+      activeCombatants.sort((a, b) => b.initiative - a.initiative);
+      renderInitiativeList();
+    });
+  }
+
+  if (resetInitBtn) {
+    resetInitBtn.addEventListener('click', () => {
+      activeCombatants = [];
+      renderInitiativeList();
+    });
+  }
+
+  // Метод добавления монстров в бой (вызывается из справочника)
+  window.addMonsterToInitiative = (monster) => {
+    const defaultHp = parseInt(monster.hp) || 10;
+    
+    const newEnemy = {
+      name: monster.name,
+      type: "enemy",
+      // Бросок d20 + Модификатор Ловкости монстра
+      initiative: Math.floor(Math.random() * 20) + 1 + Math.floor((monster.stats.ЛОВ - 10) / 2),
+      hp: defaultHp
+    };
+
+    activeCombatants.push(newEnemy);
+    activeCombatants.sort((a, b) => b.initiative - a.initiative);
+    renderInitiativeList();
+  };
+
+  // ====== СЛУШАТЕЛЬ ЖИВОГО ПОИСКА В СПРАВОЧНИКЕ ======
   const searchInput = document.querySelector('.dm-search-input');
   const compendiumBody = document.querySelector('.dm-compendium-panel .dm-card-body');
 
@@ -1678,7 +1678,7 @@ window.addMonsterToInitiative = (monster) => {
     monster.actions.forEach(act => {
       actionsHTML += `<p style="margin: 4px 0; font-size: 13px;"><strong style="color: #ff3333;">${act.name}:</strong> <span style="color: #bbb;">${act.desc}</span></p>`;
     });
-    actionsHTML += '</div>'; // Исправили advancedHTML на actionsHTML
+    actionsHTML += '</div>';
 
     resultContainer.innerHTML = `
       <div style="border-top: 1px solid #4a1111; padding-top: 15px;">
@@ -1773,4 +1773,4 @@ window.addMonsterToInitiative = (monster) => {
     }
   }, 2000);
 
-}); // <--- ВОТ ЭТА ФИНАЛЬНАЯ КОНСТРУКЦИЯ ИДЕАЛЬНО ЗАКРЫВАЕТ DOMContentLoaded С САМОЙ ВТОРОЙ СТРОКИ UI.JS!
+}); // Закрывает глобальный DOMContentLoaded со 2-й строки ui.js
