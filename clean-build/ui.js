@@ -1654,121 +1654,123 @@ window.addMonsterToInitiative = (monster) => {
 };
 
 // ====== СЛУШАТЕЛЬ ЖИВОГО ПОИСКА В СПРАВОЧНИКЕ ======
-const searchInput = document.querySelector('.dm-search-input');
-const compendiumBody = document.querySelector('.dm-compendium-panel .dm-card-body');
+  const searchInput = document.querySelector('.dm-search-input');
+  const compendiumBody = document.querySelector('.dm-compendium-panel .dm-card-body');
 
-const displayMonster = (monster) => {
-  const resultContainer = document.getElementById('dm-compendium-results') || document.createElement('div');
-  resultContainer.id = 'dm-compendium-results';
-  resultContainer.style.marginTop = '15px';
+  const displayMonster = (monster) => {
+    const resultContainer = document.getElementById('dm-compendium-results') || document.createElement('div');
+    resultContainer.id = 'dm-compendium-results';
+    resultContainer.style.marginTop = '15px';
 
-  if (!monster) {
-    resultContainer.innerHTML = '<div class="dm-empty-placeholder">Существо не найдено в бестиарии</div>';
-    if (!document.getElementById('dm-compendium-results')) compendiumBody.appendChild(resultContainer);
-    return;
-  }
-
-  let statsHTML = '<div style="display: flex; gap: 10px; margin: 10px 0; background: #150404; padding: 8px; border-radius: 4px; border: 1px solid #2d0b0b;">';
-  for (const [key, value] of Object.entries(monster.stats)) {
-    statsHTML += `<div style="text-align: center; flex: 1;"><span style="font-size: 10px; color: #888; display: block;">${key}</span><span style="font-size: 13px; color: #ff3333; font-weight: bold;">${value}</span></div>`;
-  }
-  statsHTML += '</div>';
-
-  let actionsHTML = '<div style="margin-top: 10px;">';
-  monster.actions.forEach(act => {
-    actionsHTML += `<p style="margin: 4px 0; font-size: 13px;"><strong style="color: #ff3333;">${act.name}:</strong> <span style="color: #bbb;">${act.desc}</span></p>`;
-  });
-  actionsHTML += '</div>';
-
-  resultContainer.innerHTML = `
-    <div style="border-top: 1px solid #4a1111; padding-top: 15px;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-        <h4 style="margin: 0; color: #fff; font-size: 18px;">${monster.name}</h4>
-        <button id="add-to-combat-btn" class="dm-btn-small" style="margin: 0; border-color: #00aa44; color: #00ff66;">⚔️ Добавить в бой</button>
-      </div>
-      <span style="font-size: 11px; color: #888; font-style: italic;">${monster.size}</span>
-      
-      <div style="display: flex; gap: 20px; margin-top: 10px; font-size: 13px; color: #aaa;">
-        <span><strong>КД:</strong> <span style="color: #ff3333; font-weight: bold;">${monster.ac}</span></span>
-        <span><strong>ХП:</strong> <span style="color: #00ff66;">${monster.hp}</span></span>
-        <span><strong>Скорость:</strong> ${monster.speed}</span>
-      </div>
-
-      ${statsHTML}
-      <h5 style="margin: 10px 0 5px 0; color: #ff3333; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Действия</h5>
-      ${actionsHTML}
-    </div>
-  `;
-
-  if (!document.getElementById('dm-compendium-results')) {
-    compendiumBody.appendChild(resultContainer);
-  }
-
-  // Слушатель кнопки "Добавить в бой" внутри карточки монстра
-  const addCombatBtn = document.getElementById('add-to-combat-btn');
-  if (addCombatBtn) {
-    const newBtn = addCombatBtn.cloneNode(true);
-    addCombatBtn.parentNode.replaceChild(newBtn, addCombatBtn);
-    
-    newBtn.addEventListener('click', () => {
-      if (typeof window.addMonsterToInitiative === 'function') {
-        window.addMonsterToInitiative(monster);
-      }
-    });
-  }
-};
-
-if (searchInput) {
-  searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.trim().toLowerCase();
-
-    if (!query) {
-      const res = document.getElementById('dm-compendium-results');
-      if (res) res.innerHTML = '';
+    if (!monster) {
+      resultContainer.innerHTML = '<div class="dm-empty-placeholder">Существо не найдено в бестиарии</div>';
+      if (!document.getElementById('dm-compendium-results')) compendiumBody.appendChild(resultContainer);
       return;
     }
 
-    const foundMonster = monsterCompendium.find(m => m.name.toLowerCase().includes(query));
-    displayMonster(foundMonster);
-  });
-}
+    let statsHTML = '<div style="display: flex; gap: 10px; margin: 10px 0; background: #150404; padding: 8px; border-radius: 4px; border: 1px solid #2d0b0b;">';
+    for (const [key, value] of Object.entries(monster.stats)) {
+      statsHTML += `<div style="text-align: center; flex: 1;"><span style="font-size: 10px; color: #888; display: block;">${key}</span><span style="font-size: 13px; color: #ff3333; font-weight: bold;">${value}</span></div>`;
+    }
+    statsHTML += '</div>';
 
-// Симулятор локальной сети: Проверка подключения новых игроков каждые 2 секунды
-setInterval(() => {
-  const dmScreenElement = document.getElementById('dm-screen-root');
-  if (dmScreenElement && dmScreenElement.style.display === 'block') {
-    const newPlayerName = localStorage.getItem('connected_player_name');
-    const room = localStorage.getItem('connected_room_id');
-    
-    if (newPlayerName) {
-      const partyContainer = document.getElementById('dm-party-list');
-      if (partyContainer && !partyContainer.innerHTML.includes(newPlayerName)) {
+    let actionsHTML = '<div style="margin-top: 10px;">';
+    monster.actions.forEach(act => {
+      actionsHTML += `<p style="margin: 4px 0; font-size: 13px;"><strong style="color: #ff3333;">${act.name}:</strong> <span style="color: #bbb;">${act.desc}</span></p>`;
+    });
+    actionsHTML += '</div>'; // Исправили advancedHTML на actionsHTML
+
+    resultContainer.innerHTML = `
+      <div style="border-top: 1px solid #4a1111; padding-top: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+          <h4 style="margin: 0; color: #fff; font-size: 18px;">${monster.name}</h4>
+          <button id="add-to-combat-btn" class="dm-btn-small" style="margin: 0; border-color: #00aa44; color: #00ff66;">⚔️ Добавить в бой</button>
+        </div>
+        <span style="font-size: 11px; color: #888; font-style: italic;">${monster.size}</span>
         
-        if (partyContainer.querySelector('.dm-empty-placeholder')) {
-          partyContainer.innerHTML = '';
-        }
+        <div style="display: flex; gap: 20px; margin-top: 10px; font-size: 13px; color: #aaa;">
+          <span><strong>КД:</strong> <span style="color: #ff3333; font-weight: bold;">${monster.ac}</span></span>
+          <span><strong>ХП:</strong> <span style="color: #00ff66;">${monster.hp}</span></span>
+          <span><strong>Скорость:</strong> ${monster.speed}</span>
+        </div>
 
-        const customPlayerHTML = `
-          <div class="dm-player-card">
-            <div class="dm-player-info">
-              <span class="dm-player-name">${newPlayerName}</span>
-              <span class="dm-player-class">Подключенный игрок / Комната: ${room}</span>
-            </div>
-            <div class="dm-player-hp-bar">
-              <div class="dm-hp-text">ХП: 45 / 45</div>
-              <div class="dm-hp-progress-bg">
-                <div class="dm-hp-progress-fill" style="width: 100%; background-color: #22aa44;"></div>
+        ${statsHTML}
+        <h5 style="margin: 10px 0 5px 0; color: #ff3333; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Действия</h5>
+        ${actionsHTML}
+      </div>
+    `;
+
+    if (!document.getElementById('dm-compendium-results')) {
+      compendiumBody.appendChild(resultContainer);
+    }
+
+    // Слушатель кнопки "Добавить в бой" внутри карточки монстра
+    const addCombatBtn = document.getElementById('add-to-combat-btn');
+    if (addCombatBtn) {
+      const newBtn = addCombatBtn.cloneNode(true);
+      addCombatBtn.parentNode.replaceChild(newBtn, addCombatBtn);
+      
+      newBtn.addEventListener('click', () => {
+        if (typeof window.addMonsterToInitiative === 'function') {
+          window.addMonsterToInitiative(monster);
+        }
+      });
+    }
+  };
+
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.trim().toLowerCase();
+
+      if (!query) {
+        const res = document.getElementById('dm-compendium-results');
+        if (res) res.innerHTML = '';
+        return;
+      }
+
+      const foundMonster = monsterCompendium.find(m => m.name.toLowerCase().includes(query));
+      displayMonster(foundMonster);
+    });
+  }
+
+  // Симулятор локальной сети: Проверка подключения новых игроков каждые 2 секунды
+  setInterval(() => {
+    const dmScreenElement = document.getElementById('dm-screen-root');
+    if (dmScreenElement && dmScreenElement.style.display === 'block') {
+      const newPlayerName = localStorage.getItem('connected_player_name');
+      const room = localStorage.getItem('connected_room_id');
+      
+      if (newPlayerName) {
+        const partyContainer = document.getElementById('dm-party-list');
+        if (partyContainer && !partyContainer.innerHTML.includes(newPlayerName)) {
+          
+          if (partyContainer.querySelector('.dm-empty-placeholder')) {
+            partyContainer.innerHTML = '';
+          }
+
+          const customPlayerHTML = `
+            <div class="dm-player-card">
+              <div class="dm-player-info">
+                <span class="dm-player-name">${newPlayerName}</span>
+                <span class="dm-player-class">Подключенный игрок / Комната: ${room}</span>
+              </div>
+              <div class="dm-player-hp-bar">
+                <div class="dm-hp-text">ХП: 45 / 45</div>
+                <div class="dm-hp-progress-bg">
+                  <div class="dm-hp-progress-fill" style="width: 100%; background-color: #22aa44;"></div>
+                </div>
+              </div>
+              <div class="dm-player-stats">
+                <div class="dm-stat-badge"><span class="label">КД</span><span class="value">15</span></div>
+                <div class="dm-stat-badge"><span class="label">ПВ</span><span class="value">12</span></div>
               </div>
             </div>
-            <div class="dm-player-stats">
-              <div class="dm-stat-badge"><span class="label">КД</span><span class="value">15</span></div>
-              <div class="dm-stat-badge"><span class="label">ПВ</span><span class="value">12</span></div>
-            </div>
-          </div>
-        `;
-        partyContainer.insertAdjacentHTML('beforeend', customPlayerHTML);
-        localStorage.removeItem('connected_player_name');
+          `;
+          partyContainer.insertAdjacentHTML('beforeend', customPlayerHTML);
+          localStorage.removeItem('connected_player_name');
+        }
       }
     }
-  }
-}, 2000);
+  }, 2000);
+
+}); // <--- ВОТ ЭТА ФИНАЛЬНАЯ КОНСТРУКЦИЯ ИДЕАЛЬНО ЗАКРЫВАЕТ DOMContentLoaded С САМОЙ ВТОРОЙ СТРОКИ UI.JS!
