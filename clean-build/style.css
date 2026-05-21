@@ -4135,40 +4135,31 @@ body::before {
 .dm-screen-container .dm-grid {
   display: grid !important;
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* Магия: верх сжимается по контенту (auto), а Справочник забирает ВСЁ свободное место (1fr) */
-  grid-template-rows: auto 1fr !important;    
+  /* На ПК: верх свободный, справочник аккуратно занимает 360px */
+  grid-template-rows: 1fr 360px !important;    
   gap: 20px !important;
   width: 100% !important;
-  height: calc(100vh - 60px) !important; /* Намертво привязываем сетку к высоте окна браузера */
+  height: calc(100vh - 60px) !important;
   margin: 0 !important;
-}
-
-/* Задаем минимальный комфортный размер для верхних панелей, чтобы они не схлопывались */
-.dm-screen-container .dm-party-panel,
-.dm-screen-container .dm-initiative-panel {
-  min-height: 320px !important;
-}
-
-/* Задаем минимальный комфортный размер для Справочника, чтобы карточки влезали */
-.dm-screen-container .dm-compendium-panel {
-  min-height: 380px !important;
 }
 
 /* 📱 Адаптация экрана ГМа для планшетов (iPad Air, iPad Pro и аналоги до 1400px) */
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
-    grid-template-columns: 1fr 1fr !important; /* Колонки делят экран ровно 50/50 */
-    grid-template-rows: auto 1fr !important; /* На планшетах тоже отдаем максимум места справочнику */
+    grid-template-columns: 1fr 1fr !important; /* На планшетах панели делят ширину 50/50 */
+    /* Фиксируем справочник на 450px: он поднимется выше, но не сожмет карточки игроков! */
+    grid-template-rows: 1fr 450px !important; 
     gap: 20px !important;
     height: calc(100vh - 40px) !important;
   }
 
-  /* Разрешаем Справочнику растянуться на всю ширину под двумя панелями */
+  /* Заставляем Справочник занять всю ширину экрана планшета под карточками */
   .dm-screen-container .dm-compendium-panel {
     grid-column: span 2 !important;
     grid-row: 2 !important;
   }
 }
+Используйте код с осто
 /* 📲 Адаптация экрана ГМа для вертикальных экранов и телефонов */
 @media (max-width: 768px) {
   .dm-screen-container .dm-grid {
