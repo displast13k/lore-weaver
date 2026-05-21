@@ -4131,11 +4131,11 @@ body::before {
   overflow: hidden !important;
 }
 
-/* * 3. Идеальная сетка внутренних панелей */
+/* * 3. Идеальная сетка внутренних памятных панелей */
 .dm-screen-container .dm-grid {
   display: grid !important;
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* На ПК: верх свободный (550px), справочник забирает весь остаток (1fr) */
+  /* На ПК оставляем как было — там всё супер */
   grid-template-rows: 550px 1fr !important;    
   gap: 20px !important;
   width: 100% !important;
@@ -4143,7 +4143,7 @@ body::before {
   margin: 0 !important;
 }
 
-/* Ограничиваем верхние панели */
+/* Ограничиваем верхние панели на ПК */
 .dm-screen-container .dm-party-panel,
 .dm-screen-container .dm-initiative-panel {
   max-height: 550px !important;
@@ -4151,38 +4151,42 @@ body::before {
   height: 100% !important;
 }
 
-/* Справочник на ПК */
 .dm-screen-container .dm-compendium-panel {
   height: 100% !important;
   min-height: auto !important;
 }
 
-/* 📱 Адаптация высоты ТОЛЬКО для планшетов (экраны до 1400px, вроде iPad) */
+/* 📱 Адаптация высоты ТОЛЬКО для планшетов (экраны до 1400px, вроде iPad Pro) */
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
-    /* На планшете ужимаем верх до 420px, отдавая весь низ справочнику! */
-    grid-template-rows: 420px 1fr !important; 
+    grid-template-columns: 1fr 1fr !important; /* На планшетах панели делят ширину 50/50 */
+    /* ЖЕСТКО: верх свободный (1fr), а Справочник занимает строго 300px, усаживаясь в рамку! */
+    grid-template-rows: 1fr 300px !important; 
+    height: calc(100vh - 40px) !important;
   }
   
-  .dm-screen-container .dm-party-panel,
-  .dm-screen-container .dm-initiative-panel {
-    max-height: 420px !important;
+  /* Сбрасываем десктопные ограничения по высоте для верхних панелей на планшете */
+  .dm-screen-container .dm-party-panel {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    max-height: none !important;
+    height: 100% !important;
   }
-}
 
-.dm-screen-container .dm-party-panel {
-  grid-column: 1 !important;
-  grid-row: 1 !important;
-}
+  .dm-screen-container .dm-initiative-panel {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    max-height: none !important;
+    height: 100% !important;
+  }
 
-.dm-screen-container .dm-initiative-panel {
-  grid-column: 2 !important;
-  grid-row: 1 !important;
-}
-
-.dm-screen-container .dm-compendium-panel {
-  grid-column: span 2 !important;
-  grid-row: 2 !important;
+  /* Фиксируем высоту самого справочника на планшете и растягиваем под панелями */
+  .dm-screen-container .dm-compendium-panel {
+    grid-column: span 2 !important;
+    grid-row: 2 !important;
+    height: 300px !important;
+    max-height: 300px !important;
+  }
 }
 
 /* Общие стили блоков ГМа */
