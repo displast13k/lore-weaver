@@ -4146,8 +4146,8 @@ body::before {
 /* 📱 Адаптация экрана ГМа для горизонтальных планшетов (iPad Air и аналоги) */
 @media (max-width: 1200px) {
   .dm-screen-container .dm-grid {
-    grid-template-columns: 1fr 1fr !important; /* Делаем колонки партии и боя равными 50/50 */
-    grid-template-rows: 1fr 360px !important;
+    grid-template-columns: 1fr 1fr !important; /* Колонки делят экран 50/50 */
+    grid-template-rows: 1fr 420px !important; /* Увеличиваем фиксированную высоту справочника до 420px */
     gap: 15px !important;
   }
 }
@@ -4155,12 +4155,11 @@ body::before {
 /* 📲 Адаптация экрана ГМа для вертикальных планшетов и телефонов */
 @media (max-width: 768px) {
   .dm-screen-container .dm-grid {
-    grid-template-columns: 1fr !important; /* Выстраиваем панели строго в одну колонку */
-    grid-template-rows: auto auto 360px !important; /* Даем каждой панели место, справочник снизу */
-    overflow-y: auto !important; /* Включаем вертикальный скролл для всего экрана мастера */
+    grid-template-columns: 1fr !important; 
+    grid-template-rows: auto auto 450px !important; /* В вертикальном режиме даем справочнику 450px */
+    overflow-y: auto !important; 
   }
   
-  /* Разрешаем панелям занимать всю ширину в одну колонку */
   .dm-screen-container .dm-party-panel,
   .dm-screen-container .dm-initiative-panel,
   .dm-screen-container .dm-compendium-panel {
