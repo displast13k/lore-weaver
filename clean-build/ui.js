@@ -1840,17 +1840,16 @@ if (netConnectBtn) {
 // ==========================================
 // 📡 ГЛОБАЛЬНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER»
 // ==========================================
-let window_gameSocket = null;
+window.window_gameSocket = null;
 
-// Функция ИГРОКА: Железный сбор данных напрямую из глобального состояния движка
-function sendCharacterNetworkData() {
+// Делаем функцию глобальной, чтобы она была доступна везде
+window.sendCharacterNetworkData = function() {
   const currentRoomId = document.getElementById('room-id')?.value.trim();
   const currentPlayerName = document.getElementById('player-name')?.value.trim();
   const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
 
-  if (isDM || !currentRoomId || !currentPlayerName || !window_gameSocket || window_gameSocket.readyState !== WebSocket.OPEN) return;
+  if (isDM || !currentRoomId || !currentPlayerName || !window.window_gameSocket || window.window_gameSocket.readyState !== WebSocket.OPEN) return;
 
-  // БЕРЕМ ДАННЫЕ НАПРЯМУЮ ИЗ ТВОЕГО ОБЪЕКТА ДВИЖКА (characterState)
   let currentHp = 10;
   let maxHp = 10;
   let armorClass = 10;
@@ -1864,15 +1863,13 @@ function sendCharacterNetworkData() {
     if (characterState.class !== undefined) charClass = characterState.class;
     if (characterState.level !== undefined) charLevel = parseInt(characterState.level) || 1;
   } else {
-    // Резервный сбор по селекторам на случай, если объект не инициализировался
     const hpEl = document.querySelector('.hp-current-input') || document.querySelector('.hp-value');
     if (hpEl) currentHp = parseInt(hpEl.value) || parseInt(hpEl.textContent) || 10;
     const acEl = document.querySelector('.shield-value') || document.querySelector('.ac-value');
     if (acEl) armorClass = parseInt(acEl.textContent) || parseInt(acEl.value) || 10;
   }
 
-  // Отправляем чистый JSON-пакет через открытый ретранслятор
-  window_gameSocket.send(JSON.stringify({
+  window.window_gameSocket.send(JSON.stringify({
     room: currentRoomId,
     type: 'PLAYER_UPDATE',
     sender: currentPlayerName,
@@ -1884,7 +1881,7 @@ function sendCharacterNetworkData() {
       level: charLevel
     }
   }));
-}
+};
 
 // Глобальный перехватчик кликов по кнопке подключения
 document.addEventListener('DOMContentLoaded', () => {
@@ -1899,27 +1896,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!roomId) return;
 
-        if (window_gameSocket) window_gameSocket.close();
+        if (window.window_gameSocket) window.window_gameSocket.close();
 
         // Подключаемся к свободному брокеру SocketsBay
-        window_gameSocket = new WebSocket('wss://://socketsbay.com');
+        window.window_gameSocket = new WebSocket('wss://://socketsbay.com');
 
-        window_gameSocket.onopen = () => {
+        window.window_gameSocket.onopen = () => {
           console.log(`[Сеть] Подключено к брокеру SocketsBay. Комната: ${roomId}`);
-          // ИГРОК: Даем сокету 500мс прогреться и принудительно шлем пакет ГМу
+          // Вызываем глобальную функцию через объект window
           if (!isDM && playerName) {
-            setTimeout(sendCharacterNetworkData, 500);
+            setTimeout(() => {
+              if (typeof window.sendCharacterNetworkData === 'function') {
+                window.sendCharacterNetworkData();
+              }
+            }, 500);
           }
         };
 
-        window_gameSocket.onmessage = (event) => {
+        window.window_gameSocket.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
             
-            // Фильтруем чужие пакеты на публичном демо-сервере по ROOM_ID
             if (data.room !== roomId) return;
             
-            // ГМ: Принимаем пакеты обновлений от реальных игроков
             if (isDM && data.type === 'PLAYER_UPDATE') {
               const pName = data.sender;
               const stats = data.payload;
@@ -1927,18 +1926,15 @@ document.addEventListener('DOMContentLoaded', () => {
               
               if (!partyListContainer) return;
 
-              // Стираем заглушку ожидания, если она есть
               const placeholder = partyListContainer.querySelector('.dm-empty-placeholder');
               if (placeholder) placeholder.remove();
               if (partyListContainer.textContent.includes('Ожидание подключения')) partyListContainer.innerHTML = '';
 
               let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
               
-              // Рассчитываем проценты ХП по твоей каноничной формуле
               const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
               const netBarColor = netHpPercent < 30 ? '#ff3333' : '#22aa44';
 
-              // Слепок твоей красивой верстки карточек персонажей
               const netPlayerHTML = `
                 <div class="dm-player-card" data-network-player="${pName}">
                   <div class="dm-player-info">
@@ -1963,7 +1959,6 @@ document.addEventListener('DOMContentLoaded', () => {
               if (!netCard) {
                 partyListContainer.insertAdjacentHTML('beforeend', netPlayerHTML);
               } else {
-                // Если игрок уже на экране — реактивно обновляем его данные
                 netCard.querySelector('.dm-hp-text').textContent = `ХП: ${stats.hp} / ${stats.maxHp}`;
                 const hpFill = netCard.querySelector('.dm-hp-progress-fill');
                 if (hpFill) {
@@ -1983,9 +1978,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Автоматический триггер: шлем данные ГМу каждый раз, когда игрок кликает по ХП или КД
+// Автоматический триггер обновления ХП через window
 document.addEventListener('change', (e) => {
   if (e.target && (e.target.classList.contains('hp-current-input') || e.target.id === 'current-hp' || e.target.closest('.hp-value'))) {
-    sendCharacterNetworkData();
+    if (typeof window.sendCharacterNetworkData === 'function') {
+      window.sendCharacterNetworkData();
+    }
   }
 });
