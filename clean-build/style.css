@@ -4146,35 +4146,26 @@ body::before {
 /* 📱 Адаптация экрана ГМа для планшетов (iPad Air, iPad Pro и аналоги до 1400px) */
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
-    display: flex !important; /* Включаем флексбокс вместо гридов */
-    flex-direction: column !important; /* Выстраиваем блоки вертикально: верх, потом низ */
-    gap: 15px !important;
-    height: calc(100vh - 40px) !important; /* Растягиваем на всю высоту экрана планшета */
+    grid-template-columns: 1fr 1fr !important; /* На планшетах панели делят ширину 50/50 */
+    /* Выделяем под справочник ровно 450px — это как раз поднимет его линию выше на 2 см */
+    grid-template-rows: 1fr 450px !important; 
+    gap: 20px !important;
+    height: calc(100vh - 40px) !important; /* Намертво прижимаем интерфейс к рамкам экрана */
   }
 
-  /* Заставляем верхние панели (партию и инициативу) встать в один ряд 50/50 */
-  /* Но при этом они сжимаются по высоте контента и больше не отъедают лишнее место! */
+  /* СБРАСЫВАЕМ жесткую минимальную высоту, которая ломала макет на iPad */
   .dm-screen-container .dm-party-panel,
   .dm-screen-container .dm-initiative-panel {
-    width: 50% !important;
-    height: auto !important; /* Высота строго по карточкам игроков */
     min-height: auto !important;
-  }
-
-  /* Чтобы партия и инициатива стояли на одной линии, завернем их поведение */
-  .dm-screen-container .dm-party-panel {
-    margin-right: 7px;
-  }
-  .dm-screen-container .dm-initiative-panel {
-    margin-left: 7px;
-  }
-
-  /* 🎯 СПРАВОЧНИК И ЗАМЕТКИ: забирает ВСЁ свободное место на экране */
-  .dm-screen-container .dm-compendium-panel {
-    flex-grow: 1 !important; /* Растягивается до максимума на всю свободную высоту */
-    width: 100% !important;
     height: 100% !important;
-    margin-top: 0 !important;
+  }
+
+  /* Заставляем Справочник занять всю ширину экрана планшета под карточками */
+  .dm-screen-container .dm-compendium-panel {
+    grid-column: span 2 !important;
+    grid-row: 2 !important;
+    min-height: auto !important;
+    height: 100% !important;
   }
 }
 /* 📲 Адаптация экрана ГМа для вертикальных экранов и телефонов */
