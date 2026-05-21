@@ -1948,12 +1948,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
         console.error('[Сеть] Ошибка парсинга пакета:', e);
     }
+});
 
-    abilityCards.forEach(function(card) {
-        container.appendChild(card);
-    });
-}
-
+// ===== АВТОМАТИЧЕСКИЕ ТРИГГЕРЫ И ОБРАБОТЧИКИ =====
 document.addEventListener('change', (e) => {
     if (e.target && e.target.classList.contains('hp-current-input')) {
         sendCharacterNetworkData();
