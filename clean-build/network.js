@@ -8,12 +8,11 @@ window.currentConnectedRoom = null;
 window.sendCharacterNetworkData = function() {
   const roomIdInput = document.getElementById('room-id');
   const playerNameInput = document.getElementById('player-name');
-  const partyListContainer = document.getElementById('dm-party-list');
+  const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
 
   const currentRoomId = window.currentConnectedRoom || roomIdInput?.value.trim();
   const currentPlayerName = playerNameInput?.value.trim();
 
-  // Если это экран ГМа или нет коннекта/комнаты/имени — отмена
   if (partyListContainer || !currentRoomId || !currentPlayerName || !window.window_mqttClient || !window.window_mqttClient.isConnected()) return;
 
   let currentHp = 10;
@@ -22,14 +21,12 @@ window.sendCharacterNetworkData = function() {
   let charClass = 'Игрок';
   let charLevel = 1;
 
-  // Парсим ХП из всего текста страницы (ищет шаблоны вида "13 / 13" или "11/11")
   const hpMatch = document.body.innerText.match(/(\d+)\s*[\/|]\s*(\d+)/);
   if (hpMatch) {
     currentHp = parseInt(hpMatch[1]) || 10;
     maxHp = parseInt(hpMatch[2]) || 10;
   }
 
-  // Парсим КД
   const acMatch = document.body.innerText.match(/КД\s*:\s*(\d+)/i) || document.body.innerText.match(/(\d+)\s*КД/i);
   if (acMatch) {
     armorClass = parseInt(acMatch[1]) || 10;
@@ -72,7 +69,7 @@ window.initNetworkSession = function(roomId, playerName) {
   window.window_mqttClient.onMessageArrived = (message) => {
     try {
       const data = JSON.parse(message.payloadString);
-      const partyListContainer = document.getElementById('dm-party-list');
+      const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
       
       if (partyListContainer && data.type === 'PLAYER_UPDATE') {
         const pName = data.sender;
@@ -130,8 +127,7 @@ window.initNetworkSession = function(roomId, playerName) {
       console.log(`%c[Сеть] ПОДКЛЮЧЕНО К СЕРВЕРУ! Комната: ${roomId}`, 'color: #00ff00; font-weight: bold;');
       window.window_mqttClient.subscribe(`lw_vtt_global_room_${roomId}`);
 
-      // Если мы обычный игрок — принудительно шлем первый пакет
-      const partyListContainer = document.getElementById('dm-party-list');
+      const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
       if (!partyListContainer && playerName) {
         setTimeout(window.sendCharacterNetworkData, 300);
       }
@@ -141,29 +137,25 @@ window.initNetworkSession = function(roomId, playerName) {
   });
 };
 
-// 🎯 MUTATION OBSERVER: Следит за изменениями интерфейса (входом в комнату и изменением ХП)
+// 🎯 MUTATION OBSERVER: Беспрепятственно ловит статусы БЕЗ ЗАМОРОЗОК ПОТОКА
 const observer = new MutationObserver(() => {
   const roomIdInput = document.getElementById('room-id');
   const playerNameInput = document.getElementById('player-name');
   
-  // 1. Авто-подключение: если в DOM появился текст "Подключено к" — выдергиваем ID комнаты и запускаем сеть
   if (!window.window_mqttClient || !window.window_mqttClient.isConnected()) {
     const statusText = document.body.innerText;
-    const statusMatch = statusText.match(/Подключен[оа]?\s+к\s+([a-zA-Z0-9а-яА-Я_]+)/i) || statusText.match(/Подключен[оа]?\s*:\s*([a-zA-Z0-9а-яА-Я_]+)/i);
+    const statusMatch = statusText.match(/Подключен[оа]?\s+к\s+([a-zA-Z0-9а-яА-Я_]+)/i) || 
+                        statusText.match(/Подключен[оа]?\s*:\s*([a-zA-Z0-9а-яА-Я_]+)/i);
     
     if (statusMatch && roomIdInput && roomIdInput.value) {
       const activeRoom = statusMatch[1];
       const activeName = playerNameInput ? playerNameInput.value.trim() : "Игрок";
-      console.log(`[Сеть] Перехватили системный статус подключения. Запуск комнаты: ${activeRoom}`);
       window.initNetworkSession(activeRoom, activeName);
     }
   }
 
-  // 2. Авто-обновление: если сокет открыт, пушим свежие ХП при любом шорохе на экране игрока
   if (window.window_mqttClient && window.window_mqttClient.isConnected()) {
     window.sendCharacterNetworkData();
   }
 });
-
-// Запускаем слежку за всем документом
 observer.observe(document.body, { childList: true, subtree: true, characterData: true });
