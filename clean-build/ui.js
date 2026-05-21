@@ -1979,11 +1979,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Автоматический триггер обновления ХП через window
-document.addEventListener('change', (e) => {
-  if (e.target && (e.target.classList.contains('hp-current-input') || e.target.id === 'current-hp' || e.target.closest('.hp-value'))) {
+// 🔥 УЛЬТИМАТИВНЫЙ РЕАКТИВНЫЙ ТРИГГЕР: ловим ЛЮБЫЕ клики на листе игрока и шлем пакет ГМу
+document.addEventListener('click', () => {
+  // Даем внутренним обработчикам листа 50мс, чтобы они успели обновить объект characterState, и шлем статы в сеть
+  setTimeout(() => {
     if (typeof window.sendCharacterNetworkData === 'function') {
       window.sendCharacterNetworkData();
     }
-  }
+  }, 50);
 });
