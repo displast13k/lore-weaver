@@ -4131,61 +4131,44 @@ body::before {
   overflow: hidden !important;
 }
 
-/* * 3. Идеальная сетка внутренних памятных панелей */
+/* * 3. Идельная сетка внутренних панелей */
 .dm-screen-container .dm-grid {
   display: grid !important;
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* На ПК оставляем как было — там всё супер */
-  grid-template-rows: 550px 1fr !important;    
+  /* На ПК: верх свободный (1fr), справочник аккуратно занимает 360px */
+  grid-template-rows: 1fr 360px !important;    
   gap: 20px !important;
   width: 100% !important;
   height: calc(100vh - 60px) !important;
   margin: 0 !important;
 }
 
-/* Ограничиваем верхние панели на ПК */
-.dm-screen-container .dm-party-panel,
-.dm-screen-container .dm-initiative-panel {
-  max-height: 550px !important;
-  min-height: auto !important;
-  height: 100% !important;
-}
-
-.dm-screen-container .dm-compendium-panel {
-  height: 100% !important;
-  min-height: auto !important;
-}
-
 /* 📱 Адаптация высоты ТОЛЬКО для планшетов (экраны до 1400px, вроде iPad Pro) */
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
-    grid-template-columns: 1fr 1fr !important; /* На планшетах панели делят ширину 50/50 */
-    /* ЖЕСТКО: верх свободный (1fr), а Справочник занимает строго 300px, усаживаясь в рамку! */
-    grid-template-rows: 1fr 300px !important; 
+    grid-template-columns: 1.2fr 0.8fr !important; /* На планшетах сохраняем каноничные пропорции колонок */
+    grid-template-rows: 1fr 400px !important; /* На планшете приподнимаем справочник до 400px, чтобы влезало описание */
+    gap: 15px !important;
     height: calc(100vh - 40px) !important;
   }
   
-  /* Сбрасываем десктопные ограничения по высоте для верхних панелей на планшете */
+  /* Возвращаем Справочник на его законное место в первую колонку под партию! */
+  .dm-screen-container .dm-compendium-panel {
+    grid-column: 1 !important; /* Он снова сидит строго слева и не растягивается на весь экран */
+    grid-row: 2 !important;
+    height: 100% !important;
+  }
+
+  /* Панель партии сидит сверху в первой колонке */
   .dm-screen-container .dm-party-panel {
     grid-column: 1 !important;
     grid-row: 1 !important;
-    max-height: none !important;
-    height: 100% !important;
   }
 
+  /* Трекер инициативы сидит справа на всю высоту двух рядов */
   .dm-screen-container .dm-initiative-panel {
     grid-column: 2 !important;
-    grid-row: 1 !important;
-    max-height: none !important;
-    height: 100% !important;
-  }
-
-  /* Фиксируем высоту самого справочника на планшете и растягиваем под панелями */
-  .dm-screen-container .dm-compendium-panel {
-    grid-column: span 2 !important;
-    grid-row: 2 !important;
-    height: 300px !important;
-    max-height: 300px !important;
+    grid-row: 1 / span 2 !important; /* Растягиваем инициативу вертикально, как у тебя и было */
   }
 }
 
