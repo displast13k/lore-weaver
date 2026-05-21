@@ -1895,7 +1895,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isDM) setTimeout(sendCharacterNetworkData, 500);
       };
 
-      window_gameSocket.onmessage = (event) => {
+      window.window_gameSocket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
           
@@ -1909,11 +1909,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
             
-            // Считаем проценты здоровья в точности по твоей формуле (строка 1509)
+            // Считаем проценты в точности по твоей формуле со строки 1509!
             const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
             const netBarColor = netHpPercent < 30 ? '#ff3333' : '#22aa44';
 
-            // Слепок твоей красивой верстки карточки игрока (строки 1512-1536)
+            // Идеальный слепок твоей красивой верстки
             const netPlayerHTML = `
               <div class="dm-player-card" data-network-player="${pName}">
                 <div class="dm-player-info">
@@ -1936,29 +1936,28 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             if (!netCard) {
-              // Если живой игрок подключился — добавляем его карточку на панель ГМа вслед за ботами
+              // Добавляем карточку живого игрока на экран мастера вслед за ботами
               partyListContainer.insertAdjacentHTML('beforeend', netPlayerHTML);
             } else {
               // Если игрок уже на экране — реактивно обновляем его данные на лету
               netCard.querySelector('.dm-hp-text').textContent = `ХП: ${stats.hp} / ${stats.maxHp}`;
-              netCard.querySelector('.dm-hp-progress-fill').style.width = `${netHpPercent}%`;
-              netCard.querySelector('.dm-hp-progress-fill').style.backgroundColor = netBarColor;
+              
+              const hpFill = netCard.querySelector('.dm-hp-progress-fill');
+              if (hpFill) {
+                hpFill.style.width = `${netHpPercent}%`;
+                hpFill.style.backgroundColor = netBarColor;
+              }
+              
               const acVal = netCard.querySelector('.net-ac-val');
-              if (acVal) acVal.textContent = stats.ac;
+              if (acVal) {
+                acVal.textContent = stats.ac;
+              }
             }
           }
         } catch (e) {
-          console.error('[Сеть] Ошибка парсинга пакета игрока:', e);
+          console.error('[Сеть] Ошибка парсинга пакета:', e);
         }
       };
-    };
-  }
-});
-
-// Автоматический триггер: шлем данные ГМу каждый раз, когда игрок меняет ХП на экране
-document.addEventListener('change', (e) => {
-  if (e.target && e.target.classList.contains('hp-current-input')) {
-    sendCharacterNetworkData();
   }
 //});
   }, 2000);
