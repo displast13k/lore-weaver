@@ -4167,12 +4167,13 @@ body::before {
   background: rgba(20, 5, 5, 0.85) !important;
   border: 1px solid #4a1111 !important;
 }
+
 /* 📱 Адаптация высоты ТОЛЬКО для планшетов (экраны до 1400px, вроде iPad Pro) */
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
     grid-template-columns: 1.2fr 0.8fr !important; 
-    /* На планшете ужимаем верх, давая Справочнику комфортные 420px высоты, чтобы влезало описание атак */
-    grid-template-rows: 1fr 420px !important; 
+    /* Магия: зажимаем пустой верх в 480px, а Справочник забирает ВСЁ остальное место, поднимаясь вверх! */
+    grid-template-rows: 480px 1fr !important; 
     gap: 20px !important;
     height: calc(100vh - 40px) !important;
   }
