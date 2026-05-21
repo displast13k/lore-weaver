@@ -1948,11 +1948,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
           console.error('[Сеть] Ошибка парсинга пакета:', e);
         }
-      };
-    });
-  }
-});
-
+      }
 // Автоматический триггер обновления ХП
 document.addEventListener('change', (e) => {
   if (e.target && e.target.classList.contains('hp-current-input')) {
