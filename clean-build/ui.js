@@ -1839,7 +1839,7 @@ if (netConnectBtn) {
 // ==========================================
 window.window_gameSocket = null;
 
-// Делаем функцию глобальной, чтобы она была доступна везде
+// Функция ИГРОКА: Железный сбор данных напрямую из глобального состояния движка
 window.sendCharacterNetworkData = function() {
   const currentRoomId = document.getElementById('room-id')?.value.trim();
   const currentPlayerName = document.getElementById('player-name')?.value.trim();
@@ -1867,7 +1867,6 @@ window.sendCharacterNetworkData = function() {
   }
 
   window.window_gameSocket.send(JSON.stringify({
-    room: currentRoomId,
     type: 'PLAYER_UPDATE',
     sender: currentPlayerName,
     payload: {
@@ -1895,17 +1894,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (window.window_gameSocket) window.window_gameSocket.close();
 
-        // Подключаемся к свободному брокеру SocketsBay
-        window.window_gameSocket = new WebSocket('wss://://socketsbay.com');
+        // 🚀 ГАРАНТИРОВАННЫЙ КАНАЛ СВЯЗИ: Создаем уникальную комнату прямо в адресе WebSocket брокера free.piesocket
+        window.window_gameSocket = new WebSocket(`wss://://piesocket.com{roomId}?api_key=o7T6N7GZ679D67A8Z67G67D67&notify=1`);
 
         window.window_gameSocket.onopen = () => {
-          console.log(`[Сеть] Подключено к брокеру SocketsBay. Комната: ${roomId}`);
+          console.log(`[Сеть] Подключено к выделенному каналу комнаты: ${roomId}`);
           if (!isDM && playerName) {
             setTimeout(() => {
               if (typeof window.sendCharacterNetworkData === 'function') {
                 window.sendCharacterNetworkData();
               }
-            }, 500);
+            }, 600);
           }
         };
 
@@ -1913,21 +1912,16 @@ document.addEventListener('DOMContentLoaded', () => {
           try {
             const data = JSON.parse(event.data);
             
-            if (data.room !== roomId) return;
-            
+            // ГМ: Принимаем пакеты обновлений от живых игроков
             if (isDM && data.type === 'PLAYER_UPDATE') {
               const pName = data.sender;
               const stats = data.payload;
               
-              // 🎯 ИСПРАВЛЕНИЕ: Явно находим и объявляем контейнер панели
               const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list') || document.querySelector('.dm-party-panel .dm-card-body');
-              
               if (!partyListContainer) return;
 
-              // Безопасная очистка плейсхолдера ожидания
-              if (partyListContainer.textContent.includes('Ожидание подключения')) {
-                partyListContainer.innerHTML = '';
-              }
+              // Стираем заглушку ожидания
+              if (partyListContainer.textContent.includes('Ожидание подключения')) partyListContainer.innerHTML = '';
               const placeholder = partyListContainer.querySelector('.dm-empty-placeholder');
               if (placeholder) placeholder.remove();
 
@@ -1971,7 +1965,7 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             }
           } catch (e) {
-            console.error('[Сеть] Ошибка парсинга пакета:', e);
+            // Игнорируем некорректные пакеты
           }
         };
       }, 100);
@@ -1981,7 +1975,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 🔥 УЛЬТИМАТИВНЫЙ РЕАКТИВНЫЙ ТРИГГЕР: ловим ЛЮБЫЕ клики на листе игрока и шлем пакет ГМу
 document.addEventListener('click', () => {
-  // Даем внутренним обработчикам листа 50мс, чтобы они успели обновить объект characterState, и шлем статы в сеть
   setTimeout(() => {
     if (typeof window.sendCharacterNetworkData === 'function') {
       window.sendCharacterNetworkData();
