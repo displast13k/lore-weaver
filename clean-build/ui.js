@@ -1949,11 +1949,10 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('[Сеть] Ошибка парсинга пакета:', e);
         }
 
-        // ===== АВТОМАТИЧЕСКИЕ ТРИГГЕРЫ И ОБРАБОТЧИКИ =====
-        document.addEventListener('change', (e) => {
-            if (e.target && e.target.classList.contains('hp-current-input')) {
-                sendCharacterNetworkData();
-            }
-        });
-    });
+// ===== АВТОМАТИЧЕСКИЕ ТРИГГЕРЫ И ОБРАБОТЧИКИ =====
+document.addEventListener('change', (e) => {
+    if (e.target && e.target.classList.contains('hp-current-input')) {
+        sendCharacterNetworkData();
+    }
 });
+}
