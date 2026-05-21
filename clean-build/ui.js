@@ -1955,4 +1955,4 @@ document.addEventListener('change', (e) => {
         sendCharacterNetworkData();
     }
 });
-});
+}
