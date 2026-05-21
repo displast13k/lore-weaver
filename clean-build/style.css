@@ -4146,8 +4146,8 @@ body::before {
 /* 📱 Адаптация экрана ГМа для горизонтальных планшетов (iPad Air и аналоги) */
 @media (max-width: 1200px) {
   .dm-screen-container .dm-grid {
-    grid-template-columns: 1fr 1fr !important; /* Колонки делят экран 50/50 */
-    grid-template-rows: 1fr 420px !important; /* Увеличиваем фиксированную высоту справочника до 420px */
+    grid-template-columns: 1fr 1fr !important; /* Панели делят экран пополам */
+    grid-template-rows: 1fr 45vh !important; /* Магия: справочник занимает 45% от ВСЕЙ высоты экрана! */
     gap: 15px !important;
   }
 }
@@ -4156,7 +4156,7 @@ body::before {
 @media (max-width: 768px) {
   .dm-screen-container .dm-grid {
     grid-template-columns: 1fr !important; 
-    grid-template-rows: auto auto 450px !important; /* В вертикальном режиме даем справочнику 450px */
+    grid-template-rows: auto auto 50vh !important; /* В вертикальном режиме отдаем справочнику половину экрана */
     overflow-y: auto !important; 
   }
   
