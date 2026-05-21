@@ -8,7 +8,7 @@ window.currentConnectedRoom = null;
 window.sendCharacterNetworkData = function() {
   const roomIdInput = document.getElementById('room-id');
   const playerNameInput = document.getElementById('player-name');
-  const partyListContainer = document.getElementById('dm-party-list') || document.getElementById('dm-party-results');
+  const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
 
   const currentRoomId = window.currentConnectedRoom || roomIdInput?.value.trim();
   const currentPlayerName = playerNameInput?.value.trim();
@@ -144,14 +144,14 @@ window.initNetworkSession = function(roomId, playerName, isDM) {
   });
 };
 
-// 🎯 СИЛОВОЙ ПЕРЕХВАТЧИК КЛИКА: запускает сеть по нажатию кнопки «ПОДКЛЮЧИТЬСЯ» в обход любых текстовых плашек
+// 🎯 СИЛОВОЙ ПЕРЕХВАТЧИК КЛИКА: запускает сеть по нажатию кнопки «ПОДКЛЮЧИТЬСЯ»
 document.addEventListener('click', (e) => {
   if (e.target && (e.target.id === 'netConnectBtn' || e.target.textContent.includes('ПОДКЛЮЧИТЬСЯ'))) {
     // Даем твоему основному коду 150мс, чтобы он выполнил переключение интерфейса
     setTimeout(() => {
       const roomIdInput = document.getElementById('room-id');
       const playerNameInput = document.getElementById('player-name');
-      const partyListContainer = document.getElementById('dm-party-list') || document.getElementById('dm-party-results');
+      const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
 
       const roomId = roomIdInput?.value.trim();
       const playerName = playerNameInput ? playerNameInput.value.trim() : "Мастер";
