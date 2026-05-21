@@ -1836,7 +1836,7 @@ if (netConnectBtn) {
         }
       }
     }
-  }, 2000);
+  }
 // ==========================================
 // 📡 ГЛОБАЛЬНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER»
 // ==========================================
@@ -1960,5 +1960,6 @@ document.addEventListener('change', (e) => {
   if (e.target && e.target.classList.contains('hp-current-input')) {
     sendCharacterNetworkData();
   }
-});
+//});
+  }, 2000);
 //}); // Закрывает глобальный DOMContentLoaded со 2-й строки ui.js
