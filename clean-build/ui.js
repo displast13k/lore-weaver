@@ -1835,7 +1835,7 @@ if (netConnectBtn) {
     }
   }, 2000);
 // ==========================================
-// 📡 ГЛОБАЛЬНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER» (MQTT)
+// 📡 ГЛОБАЛЬНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER» (MQTT ГАРАНТ)
 // ==========================================
 window.window_mqttClient = null;
 
@@ -1854,10 +1854,29 @@ window.sendCharacterNetworkData = function() {
   let charClass = 'Бард';
   let charLevel = 1;
 
-  if (typeof characterState !== 'undefined') {
+  // 🎯 ЖЕСТКИЙ СБОР СТАТ НАПРЯМУЮ ИЗ ВЕРСТКИ ТВОЕГО ЧАРЛИСТА С СОХРАНЕНИЕМ РЕЗЕРВА В ЧАРСТЕЙТ
+  const hpTextEl = document.querySelector('.hp-current-input') || document.querySelector('.hp-value') || document.querySelector('.character-hp-val') || document.body;
+  const hpMatch = document.body.innerText.match(/(\d+)\s*\/\s*(\d+)\s*ХП/i) || document.body.innerText.match(/ХП\s*:\s*(\d+)\s*\/\s*(\d+)/i) || document.body.innerText.match(/(\d+)\s*\/\s*(\d+)/);
+  
+  if (hpMatch) {
+    currentHp = parseInt(hpMatch[1]) || 10;
+    maxHp = parseInt(hpMatch[2]) || 10;
+  } else if (typeof characterState !== 'undefined') {
     if (characterState.hpCurrent !== undefined) currentHp = parseInt(characterState.hpCurrent) || 10;
     if (characterState.hpMax !== undefined) maxHp = parseInt(characterState.hpMax) || 10;
-    if (characterState.ac !== undefined) armorClass = parseInt(characterState.ac) || 10;
+  }
+
+  // Сбор КД (Класса Доспеха)
+  const acMatch = document.body.innerText.match(/(\d+)\s*КД/i) || document.body.innerText.match(/КД\s*:\s*(\d+)/i);
+  if (acMatch) {
+    armorClass = parseInt(acMatch[1]) || 10;
+  } else {
+    const shieldValueEl = document.querySelector('.shield-value') || document.querySelector('.ac-value');
+    if (shieldValueEl) armorClass = parseInt(shieldValueEl.textContent) || parseInt(shieldValueEl.value) || 10;
+    else if (typeof characterState !== 'undefined' && characterState.ac !== undefined) armorClass = parseInt(characterState.ac) || 10;
+  }
+
+  if (typeof characterState !== 'undefined') {
     if (characterState.class !== undefined) charClass = characterState.class;
     if (characterState.level !== undefined) charLevel = parseInt(characterState.level) || 1;
   }
@@ -1870,9 +1889,10 @@ window.sendCharacterNetworkData = function() {
 
   try {
     const message = new Paho.MQTT.Message(packet);
-    message.destinationName = `lore_weaver_vtt_room_${currentRoomId}`;
+    // ИСПОЛЬЗУЕМ УНИКАЛЬНЫЙ РАЗРЕШЕННЫЙ ПРЕФИКС ТОПИКА ДЛЯ HIVEMQ БРОКЕРА
+    message.destinationName = `hivemq_lw_vtt_global_room_${currentRoomId}`;
     window.window_mqttClient.send(message);
-    console.log(`%c[Сеть ПЕРЕДАТЧИК] Отправлен пакет от Игрока (${currentPlayerName})`, 'color: #00ff00; font-weight: bold;');
+    console.log(`%c[Сеть ПЕРЕДАТЧИК] Отправлен пакет от Игрока (${currentPlayerName}): ${currentHp}/${maxHp} ХП, ${armorClass} КД`, 'color: #00ff00; font-weight: bold;');
   } catch (e) {
     console.error('[Сеть] Ошибка отправки пакета:', e);
   }
@@ -1882,7 +1902,7 @@ window.sendCharacterNetworkData = function() {
 window.initNetworkSession = function(roomId, playerName, isDM) {
   if (!roomId) return;
   if (typeof Paho === 'undefined') {
-    console.error('%c[Сеть] КРИТИЧЕСКАЯ ОШИБКА: Библиотека Paho MQTT не найдена на странице! Проверьте index.html', 'color: #ff0000; font-weight: bold;');
+    console.error('%c[Сеть] КРИТИЧЕСКАЯ ОШИБКА: Библиотека Paho MQTT не найдена на странице!', 'color: #ff0000; font-weight: bold;');
     return;
   }
 
@@ -1903,7 +1923,7 @@ window.initNetworkSession = function(roomId, playerName, isDM) {
         const pName = data.sender;
         const stats = data.payload;
         
-        console.log(`%c[Сеть ПРИЁМНИК ГМА] Успешно получен пакет от игрока: ${pName}`, 'color: #00ffff;', stats);
+        console.log(`%c[Сеть ПРИЁМНИК ГМА] УСПЕШНО ПОЛУЧЕН ПАКЕТ от игрока: ${pName}`, 'color: #00ffff; font-weight: bold;', stats);
 
         let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
         const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
@@ -1952,14 +1972,16 @@ window.initNetworkSession = function(roomId, playerName, isDM) {
 
   window.window_mqttClient.connect({
     onSuccess: () => {
-      console.log(`%c[Сеть] СЕССИЯ УСПЕШНО ЗАПУЩЕНА! Подключено к HiveMQ SSL. Топик: lore_weaver_vtt_room_${roomId}`, 'color: #00ff00; font-weight: bold;');
-      window.window_mqttClient.subscribe(`lore_weaver_vtt_room_${roomId}`);
+      const targetTopic = `hivemq_lw_vtt_global_room_${roomId}`;
+      console.log(`%c[Сеть] СЕССИЯ УСПЕШНО ЗАПУЩЕНА! Подключено к HiveMQ SSL. Топик: ${targetTopic}`, 'color: #00ff00; font-weight: bold;');
+      window.window_mqttClient.subscribe(targetTopic);
 
       // ИГРОК: Даем сети 300мс прогреться и принудительно шлем первый пакет ГМу
-      if (!isDM && playerName) {
+      const partyListContainer = document.getElementById('dm-party-list');
+      if (!partyListContainer && playerName) {
         setTimeout(() => {
           if (typeof window.sendCharacterNetworkData === 'function') window.sendCharacterNetworkData();
-        }, 400);
+        }, 500);
       }
     },
     onFailure: (err) => console.error('[Сеть] Ошибка MQTT коннекта:', err),
@@ -1969,9 +1991,7 @@ window.initNetworkSession = function(roomId, playerName, isDM) {
 
 // 🎯 СИЛОВОЙ ПЕРЕХВАТЧИК КЛИКА: Запускает сокет принудительно и ГМу, и Игроку
 document.addEventListener('click', (e) => {
-  // Проверяем, кликнули ли именно на кнопку подключения (по ID или классам)
   if (e.target && (e.target.id === 'netConnectBtn' || e.target.textContent.includes('ПОДКЛЮЧИТЬСЯ'))) {
-    // Даем твоему старому коду 100мс отработать и запустить смену экранов
     setTimeout(() => {
       const roomId = document.getElementById('room-id')?.value.trim();
       const playerName = document.getElementById('player-name')?.value.trim();
@@ -1981,11 +2001,11 @@ document.addEventListener('click', (e) => {
         console.log(`[Сеть] Силовой запуск сессии для комнаты: ${roomId}`);
         window.initNetworkSession(roomId, playerName, isDM);
       }
-    }, 100);
+    }, 120);
   }
 });
 
-// 🔥 УЛЬТИМАТИВНЫЙ РЕАКТИВНЫЙ ТРИГГЕР: ловим любые клики на листе игрока для апдейта ХП
+// 🔥 УЛЬТИМАТИВНЫЙ РЕАКТИВНЫЙ ТРИГГЕР: ловим любые клики на листе игрока для апдейта ХП ГМу
 document.addEventListener('click', () => {
   setTimeout(() => {
     if (typeof window.sendCharacterNetworkData === 'function') {
