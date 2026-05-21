@@ -4147,17 +4147,22 @@ body::before {
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
     grid-template-columns: 1fr 1fr !important; /* На планшетах панели делят ширину 50/50 */
-    /* Переворачиваем логику: жестко фиксируем верх на 500px, а Справочник забирает ВСЕ остальное место (1fr) */
-    grid-template-rows: 500px 1fr !important; 
+    grid-template-rows: 1fr 360px !important; 
     gap: 20px !important;
-    height: calc(100vh - 40px) !important; /* Обрезаем сетку ровно по высоте экрана планшета */
+    height: calc(100vh - 40px) !important;
   }
 
-  /* Заставляем Справочник занять всю ширину экрана планшета под карточками */
+  /* Заставляем Справочник занять всю ширину экрана планшета и СИЛОЙ двигаем его вверх */
   .dm-screen-container .dm-compendium-panel {
     grid-column: span 2 !important;
     grid-row: 2 !important;
-    height: 100% !important; /* Разрешаем панели справочника занять весь выделенный ряд */
+    
+    /* ФИЗИЧЕСКИЙ СДВИГ ВВЕРХ: Смещаем панель на ~2 см вверх и компенсируем высоту */
+    margin-top: -80px !important; 
+    height: 440px !important; 
+    
+    position: relative !important;
+    z-index: 10 !important; /* Чтобы справочник красиво перекрыл пустую зону верхних панелей */
   }
 }
 
