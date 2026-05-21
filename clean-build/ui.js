@@ -1913,7 +1913,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
             const netBarColor = netHpPercent < 30 ? '#ff3333' : '#22aa44';
 
-            // Идеальный слепок твоей красивой верстки
+            // Идеальный слепок твоей красивой вёрстки карточки
             const netPlayerHTML = `
               <div class="dm-player-card" data-network-player="${pName}">
                 <div class="dm-player-info">
@@ -1958,7 +1958,6 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error('[Сеть] Ошибка парсинга пакета:', e);
         }
       };
-  }
 //});
   }, 2000);
 //}); // Закрывает глобальный DOMContentLoaded со 2-й строки ui.js
