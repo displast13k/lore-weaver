@@ -1610,7 +1610,7 @@ if (netConnectBtn) {
       localStorage.setItem('connected_player_name', playerName);
       localStorage.setItem('connected_room_id', roomId);
 
-      alert(`Вы подключились к комнате ${roomId} как игрок ${playerName}!`);
+      console.log(`[Сеть] Успешный вход в комнату: ${roomId}`);
     }
   });
 }
