@@ -1948,10 +1948,14 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
           console.error('[Сеть] Ошибка парсинга пакета:', e);
         }
-      }
-// Автоматический триггер обновления ХП
+    } catch (e) {
+        console.error('[Сеть] Ошибка парсинга пакета:', e);
+    }
+} // Закрывает netCardEventListener / updateNetCards (в зависимости от названия функции выше)
+
+// ===== АВТОМАТИЧЕСКИЕ ТРИГГЕРЫ И ОБРАБОТЧИКИ =====
 document.addEventListener('change', (e) => {
-  if (e.target && e.target.classList.contains('hp-current-input')) {
-    sendCharacterNetworkData();
-  }
+    if (e.target && e.target.classList.contains('hp-current-input')) {
+        sendCharacterNetworkData();
+    }
 });
