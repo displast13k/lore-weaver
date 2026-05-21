@@ -1538,7 +1538,72 @@ if (netConnectBtn) {
           partyListContainer.insertAdjacentHTML('beforeend', playerCardHTML);
         });
       }
+    // ==========================================
+    // 📡 СЕТЕВОЙ ПРИЁМНИК ГМА (Синхронизация в реальном времени)
+    // ==========================================
+    const roomId = document.getElementById('room-id')?.value.trim();
+    
+    // Если ГМ ввёл ID комнаты перед включением режима, открываем сетевой шлюз
+    if (roomId && !window.window_gameSocket) {
+      window.window_gameSocket = new WebSocket(`wss://://piesocket.com{roomId}?api_key=VCpe6vCgSOfnH62309icC2Z9Al6gbe6p&notify=1`);
 
+      window.window_gameSocket.onopen = () => {
+        console.log(`[Сеть] ГМ успешно подключился к комнате: ${roomId}`);
+      };
+
+      window.window_gameSocket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          // Принимаем обновления от реальных игроков
+          if (data.type === 'PLAYER_UPDATE') {
+            const playerName = data.sender;
+            const stats = data.payload;
+            
+            // Проверяем, есть ли уже на экране карточка этого сетевого игрока
+            let netCard = document.querySelector(`[data-network-player="${playerName}"]`);
+            
+            const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
+            const netBarColor = netHpPercent < 30 ? '#ff3333' : '#22aa44';
+
+            // Шаблон карточки, полностью повторяющий твою идеальную вёрстку на скриншоте!
+            const netPlayerHTML = `
+              <div class="dm-player-card" data-network-player="${playerName}">
+                <div class="dm-player-info">
+                  <span class="dm-player-name">${playerName}🌐</span>
+                  <span class="dm-player-class">${stats.class} / ${stats.level} ур.</span>
+                </div>
+                <div class="dm-player-hp-bar">
+                  <div class="dm-hp-text">ХП: ${stats.hp} / ${stats.maxHp}</div>
+                  <div class="dm-hp-progress-bg">
+                    <div class="dm-hp-progress-fill" style="width: ${netHpPercent}%; background-color: ${netBarColor};"></div>
+                  </div>
+                </div>
+                <div class="dm-player-stats">
+                  <div class="dm-stat-badge">
+                    <span class="label">КД</span>
+                    <span class="value">${stats.ac}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            if (!netCard) {
+              // Если игрок подключился впервые — добавляем его карточку на панель
+              partyListContainer.insertAdjacentHTML('beforeend', netPlayerHTML);
+            } else {
+              // Если игрок уже есть — реактивно обновляем его ХП и КД прямо на экране ГМа!
+              netCard.querySelector('.dm-hp-text').textContent = `ХП: ${stats.hp} / ${stats.maxHp}`;
+              netCard.querySelector('.dm-hp-progress-fill').style.width = `${netHpPercent}%`;
+              netCard.querySelector('.dm-hp-progress-fill').style.backgroundColor = netBarColor;
+              netCard.querySelectorAll('.value')[0].textContent = stats.ac;
+            }
+          }
+        } catch (e) {
+          console.error('[Сеть] Ошибка обработки пакета игрока:', e);
+        }
+      };
+    }
     } else {
       if (screenRoot) screenRoot.classList.remove('dm-mode-active');
       if (dmScreen) screenScreen?.style ? dmScreen.style.display = 'none' : null;
