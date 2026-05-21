@@ -1835,17 +1835,17 @@ if (netConnectBtn) {
     }
   }, 2000);
 // ==========================================
-// 📡 ГЛОБАЛЬНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER»
+// 📡 ГЛОБАЛЬНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER» (MQTT через Paho CDN)
 // ==========================================
-window.window_gameSocket = null;
+window.window_mqttClient = null;
 
-// Функция ИГРОКА: Железный сбор данных напрямую из глобального состояния движка
+// Функция ИГРОКА: Собирает данные из characterState и пушит ГМу в топик комнаты
 window.sendCharacterNetworkData = function() {
   const currentRoomId = document.getElementById('room-id')?.value.trim();
   const currentPlayerName = document.getElementById('player-name')?.value.trim();
   const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
 
-  if (isDM || !currentRoomId || !currentPlayerName || !window.window_gameSocket || window.window_gameSocket.readyState !== WebSocket.OPEN) return;
+  if (isDM || !currentRoomId || !currentPlayerName || !window.window_mqttClient || !window.window_mqttClient.isConnected()) return;
 
   let currentHp = 10;
   let maxHp = 10;
@@ -1866,19 +1866,22 @@ window.sendCharacterNetworkData = function() {
     if (acEl) armorClass = parseInt(acEl.textContent) || parseInt(acEl.value) || 10;
   }
 
-  // Отправляем пакет данных через открытый зашифрованный ретранслятор WSS
-  window.window_gameSocket.send(JSON.stringify({
-    room: currentRoomId,
+  // Упаковываем данные в JSON-строку
+  const packet = JSON.stringify({
     type: 'PLAYER_UPDATE',
     sender: currentPlayerName,
-    payload: {
-      hp: currentHp,
-      maxHp: maxHp,
-      ac: armorClass,
-      class: charClass,
-      level: charLevel
-    }
-  }));
+    payload: { hp: currentHp, maxHp: maxHp, ac: armorClass, class: charClass, level: charLevel }
+  });
+
+  // Публикуем сообщение в изолированный топик нашей комнаты на сервере HiveMQ
+  try {
+    const message = new Paho.MQTT.Message(packet);
+    message.destinationName = `lore_weaver_vtt_room_${currentRoomId}`;
+    window.window_mqttClient.send(message);
+    console.log('[Сеть] Пакет характеристик отправлен ГМу.');
+  } catch (e) {
+    console.error('[Сеть] Ошибка отправки пакета:', e);
+  }
 };
 
 // Глобальный перехватчик кликов по кнопке подключения
@@ -1894,31 +1897,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!roomId) return;
 
-        if (window.window_gameSocket) window.window_gameSocket.close();
+        // Если библиотека Paho не загрузилась из CDN — выводим ошибку
+        if (typeof Paho === 'undefined') {
+          alert('Сетевой движок не успел загрузиться. Проверьте index.html!');
+          return;
+        }
 
-        // ИСПОЛЬЗУЕМ СТАБИЛЬНЫЙ ЗАЩИЩЕННЫЙ WSS СЕРВЕР (Разрешен GitHub Pages)
-        window.window_gameSocket = new WebSocket('wss://echo.websocket.org');
+        if (window.window_mqttClient && window.window_mqttClient.isConnected()) {
+          window.window_mqttClient.disconnect();
+        }
 
-        window.window_gameSocket.onopen = () => {
-          console.log(`[Сеть] Подключено к защищённому каналу брокера. Комната: ${roomId}`);
-          // ИГРОК: Даем сокету 500мс прогреться и принудительно шлем пакет ГМу
-          if (!isDM && playerName) {
-            setTimeout(() => {
-              if (typeof window.sendCharacterNetworkData === 'function') {
-                window.sendCharacterNetworkData();
-              }
-            }, 500);
-          }
-        };
+        // Создаем уникальный клиент-ID для этой вкладки браузера
+        const clientId = 'lw_client_' + Math.random().toString(36).substring(2, 10);
+        
+        // Подключаемся к промышленному защищенному SSL-серверу HiveMQ (разрешен на GitHub Pages)
+        window.window_mqttClient = new Paho.MQTT.Client('://hivemq.com', 8884, '/mqtt', clientId);
 
-        window.window_gameSocket.onmessage = (event) => {
+        window.window_mqttClient.onMessageArrived = (message) => {
           try {
-            const data = JSON.parse(event.data);
+            const data = JSON.parse(message.payloadString);
             
-            // Проверяем соответствие комнаты (если данные пришли из чужой сессии — игнорируем)
-            if (data.room !== roomId) return;
-            
-            // ГМ: Принимаем пакеты обновлений от живых игроков из сети
+            // ГМ: Ловим пакеты обновлений от живых игроков из нашего топика сессии
             if (isDM && data.type === 'PLAYER_UPDATE') {
               const pName = data.sender;
               const stats = data.payload;
@@ -1926,10 +1925,7 @@ document.addEventListener('DOMContentLoaded', () => {
               const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list') || document.querySelector('.dm-party-panel .dm-card-body');
               if (!partyListContainer) return;
 
-              // Безопасно очищаем заглушку ожидания
-              if (partyListContainer.textContent.includes('Ожидание подключения')) {
-                partyListContainer.innerHTML = '';
-              }
+              if (partyListContainer.textContent.includes('Ожидание подключения')) partyListContainer.innerHTML = '';
               const placeholder = partyListContainer.querySelector('.dm-empty-placeholder');
               if (placeholder) placeholder.remove();
 
@@ -1973,15 +1969,38 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             }
           } catch (e) {
-            // Игнорируем фоновые системные пакеты
+            // Игнорируем фоновый шум брокера
           }
         };
+
+        // Запуск сессии и подписка на изолированный топик комнаты
+        window.window_mqttClient.connect({
+          onSuccess: () => {
+            console.log(`[Сеть] Успешно подключено к HiveMQ. Комната: ${roomId}`);
+            
+            // Подписываемся на топик нашей комнаты
+            window.window_mqttClient.subscribe(`lore_weaver_vtt_room_${roomId}`);
+
+            // ИГРОК: Даем сети 300мс прогреться и принудительно шлем пакет ГМу
+            if (!isDM && playerName) {
+              setTimeout(() => {
+                if (typeof window.sendCharacterNetworkData === 'function') {
+                  window.sendCharacterNetworkData();
+                }
+              }, 300);
+            }
+          },
+          onFailure: (err) => {
+            console.error('[Сеть] Ошибка подключения к брокеру:', err);
+          },
+          useSSL: true // Намертво пробивает защиту Mixed Content на GitHub Pages!
+        });
       }, 100);
     });
   }
 });
 
-// 🔥 УЛЬТИМАТИВНЫЙ РЕАКТИВНЫЙ ТРИГГЕР: ловим ЛЮБЫЕ клики на листе игрока и шлем пакет ГМу
+// 🔥 УЛЬТИМАТИВНЫЙ ТРИГГЕР: ловим ЛЮБЫЕ клики на листе игрока и шлем пакет ГМу
 document.addEventListener('click', () => {
   setTimeout(() => {
     if (typeof window.sendCharacterNetworkData === 'function') {
