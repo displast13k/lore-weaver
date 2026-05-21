@@ -4135,22 +4135,32 @@ body::before {
 .dm-screen-container .dm-grid {
   display: grid !important;
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* Меняем 240рх на 360рх для нижней строки */
-  grid-template-rows: 1fr 360px !important;    
+  /* Магия: верх сжимается по контенту (auto), а Справочник забирает ВСЁ свободное место (1fr) */
+  grid-template-rows: auto 1fr !important;    
   gap: 20px !important;
   width: 100% !important;
-  height: 100% !important;
+  height: calc(100vh - 60px) !important; /* Намертво привязываем сетку к высоте окна браузера */
   margin: 0 !important;
+}
+
+/* Задаем минимальный комфортный размер для верхних панелей, чтобы они не схлопывались */
+.dm-screen-container .dm-party-panel,
+.dm-screen-container .dm-initiative-panel {
+  min-height: 320px !important;
+}
+
+/* Задаем минимальный комфортный размер для Справочника, чтобы карточки влезали */
+.dm-screen-container .dm-compendium-panel {
+  min-height: 380px !important;
 }
 
 /* 📱 Адаптация экрана ГМа для планшетов (iPad Air, iPad Pro и аналоги до 1400px) */
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
     grid-template-columns: 1fr 1fr !important; /* Колонки делят экран ровно 50/50 */
-    /* Жёсткое деление высоты экрана: 60% на игроков/бой, 40% на Справочник */
-    grid-template-rows: 60fr 40fr !important; 
+    grid-template-rows: auto 1fr !important; /* На планшетах тоже отдаем максимум места справочнику */
     gap: 20px !important;
-    height: calc(100vh - 40px) !important; /* Намертво привязываем сетку к рамкам экрана */
+    height: calc(100vh - 40px) !important;
   }
 
   /* Разрешаем Справочнику растянуться на всю ширину под двумя панелями */
@@ -4159,7 +4169,6 @@ body::before {
     grid-row: 2 !important;
   }
 }
-
 /* 📲 Адаптация экрана ГМа для вертикальных экранов и телефонов */
 @media (max-width: 768px) {
   .dm-screen-container .dm-grid {
