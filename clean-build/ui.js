@@ -1840,124 +1840,122 @@ if (netConnectBtn) {
 // ==========================================
 // 📡 ГЛОБАЛЬНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER»
 // ==========================================
-(function() {
-  let window_gameSocket = null;
+let window_gameSocket = null;
 
-  // Функция сбора и отправки данных Игрока на экран ГМа
-  window.sendCharacterNetworkData = function() {
-    const currentRoomId = document.getElementById('room-id')?.value.trim();
-    const currentPlayerName = document.getElementById('player-name')?.value.trim();
-    const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
+// Функция сбора и отправки данных Игрока на экран ГМа
+function sendCharacterNetworkData() {
+  const currentRoomId = document.getElementById('room-id')?.value.trim();
+  const currentPlayerName = document.getElementById('player-name')?.value.trim();
+  const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
 
-    if (isDM || !currentRoomId || !currentPlayerName || !window_gameSocket || window_gameSocket.readyState !== WebSocket.OPEN) return;
+  if (isDM || !currentRoomId || !currentPlayerName || !window_gameSocket || window_gameSocket.readyState !== WebSocket.OPEN) return;
 
-    const currentHpInput = document.querySelector('.hp-current-input');
-    const shieldValueEl = document.querySelector('.shield-value');
+  const currentHpInput = document.querySelector('.hp-current-input');
+  const shieldValueEl = document.querySelector('.shield-value');
 
-    const characterSnapshot = {
-      hp: currentHpInput ? parseInt(currentHpInput.value) || 10 : 10,
-      maxHp: typeof characterState !== 'undefined' ? characterState.hpMax || 10 : 10,
-      ac: shieldValueEl ? parseInt(shieldValueEl.textContent) || 10 : 10,
-      class: typeof characterState !== 'undefined' ? characterState.class || 'Воин' : 'Воин',
-      level: typeof characterState !== 'undefined' ? characterState.level || 1 : 1
-    };
-
-    window_gameSocket.send(JSON.stringify({
-      type: 'PLAYER_UPDATE',
-      sender: currentPlayerName,
-      payload: characterSnapshot
-    }));
+  const characterSnapshot = {
+    hp: currentHpInput ? parseInt(currentHpInput.value) || 10 : 10,
+    maxHp: typeof characterState !== 'undefined' ? characterState.hpMax || 10 : 10,
+    ac: shieldValueEl ? parseInt(shieldValueEl.textContent) || 10 : 10,
+    class: typeof characterState !== 'undefined' ? characterState.class || 'Воин' : 'Воин',
+    level: typeof characterState !== 'undefined' ? characterState.level || 1 : 1
   };
 
-  // Навешиваем запуск сокета на кнопку подключения
-  document.addEventListener('DOMContentLoaded', () => {
-    const connectBtn = document.getElementById('netConnectBtn') || document.querySelector('.net-sidebar button');
-    
-    if (connectBtn) {
-      connectBtn.addEventListener('click', () => {
-        const roomId = document.getElementById('room-id')?.value.trim();
-        const playerName = document.getElementById('player-name')?.value.trim();
-        const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
+  window_gameSocket.send(JSON.stringify({
+    type: 'PLAYER_UPDATE',
+    sender: currentPlayerName,
+    payload: characterSnapshot
+  }));
+}
 
-        if (!roomId) return;
+// Навешиваем запуск сокета на кнопку подключения
+document.addEventListener('DOMContentLoaded', () => {
+  const connectBtn = document.getElementById('netConnectBtn') || document.querySelector('.net-sidebar button');
+  
+  if (connectBtn) {
+    connectBtn.addEventListener('click', () => {
+      const roomId = document.getElementById('room-id')?.value.trim();
+      const playerName = document.getElementById('player-name')?.value.trim();
+      const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
 
-        if (window_gameSocket) {
-          window_gameSocket.close();
-        }
+      if (!roomId) return;
 
-        window_gameSocket = new WebSocket(`wss://://piesocket.com{roomId}?api_key=VCpe6vCgSOfnH62309icC2Z9Al6gbe6p&notify=1`);
+      if (window_gameSocket) {
+        window_gameSocket.close();
+      }
 
-        window_gameSocket.onopen = () => {
-          console.log(`[Сеть] Подключено к комнате ${roomId}. Роль: ${isDM ? 'ГМ' : 'Игрок'}`);
-          if (!isDM) setTimeout(window.sendCharacterNetworkData, 500);
-        };
+      window_gameSocket = new WebSocket(`wss://://piesocket.com{roomId}?api_key=VCpe6vCgSOfnH62309icC2Z9Al6gbe6p&notify=1`);
 
-        window_gameSocket.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data);
+      window_gameSocket.onopen = () => {
+        console.log(`[Сеть] Подключено к комнате ${roomId}. Роль: ${isDM ? 'ГМ' : 'Игрок'}`);
+        if (!isDM) setTimeout(sendCharacterNetworkData, 500);
+      };
+
+      window_gameSocket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          if (isDM && data.type === 'PLAYER_UPDATE') {
+            const pName = data.sender;
+            const stats = data.payload;
+            const partyListContainer = document.getElementById('dm-party-list');
             
-            if (isDM && data.type === 'PLAYER_UPDATE') {
-              const pName = data.sender;
-              const stats = data.payload;
-              const partyListContainer = document.getElementById('dm-party-list');
-              
-              if (!partyListContainer) return;
+            if (!partyListContainer) return;
 
-              let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
-              
-              const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
-              const netBarColor = netHpPercent < 30 ? '#ff3333' : '#22aa44';
+            let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
+            
+            const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
+            const netBarColor = netHpPercent < 30 ? '#ff3333' : '#22aa44';
 
-              const netPlayerHTML = `
-                <div class="dm-player-card" data-network-player="${pName}">
-                  <div class="dm-player-info">
-                    <span class="dm-player-name">${pName} 🌐</span>
-                    <span class="dm-player-class">${stats.class}</span>
-                  </div>
-                  <div class="dm-player-hp-bar">
-                    <div class="dm-hp-text">ХП: ${stats.hp} / ${stats.maxHp}</div>
-                    <div class="dm-hp-progress-bg">
-                      <div class="dm-hp-progress-fill" style="width: ${netHpPercent}%; background-color: ${netBarColor};"></div>
-                    </div>
-                  </div>
-                  <div class="dm-player-stats">
-                    <div class="dm-stat-badge">
-                      <span class="label">КД</span>
-                      <span class="value net-ac-val">${stats.ac}</span>
-                    </div>
+            const netPlayerHTML = `
+              <div class="dm-player-card" data-network-player="${pName}">
+                <div class="dm-player-info">
+                  <span class="dm-player-name">${pName} 🌐</span>
+                  <span class="dm-player-class">${stats.class}</span>
+                </div>
+                <div class="dm-player-hp-bar">
+                  <div class="dm-hp-text">ХП: ${stats.hp} / ${stats.maxHp}</div>
+                  <div class="dm-hp-progress-bg">
+                    <div class="dm-hp-progress-fill" style="width: ${netHpPercent}%; background-color: ${netBarColor};"></div>
                   </div>
                 </div>
-              `;
+                <div class="dm-player-stats">
+                  <div class="dm-stat-badge">
+                    <span class="label">КД</span>
+                    <span class="value net-ac-val">${stats.ac}</span>
+                  </div>
+                </div>
+              </div>
+            `;
 
-              if (!netCard) {
-                partyListContainer.insertAdjacentHTML('beforeend', netPlayerHTML);
-              } else {
-                netCard.querySelector('.dm-hp-text').textContent = `ХП: ${stats.hp} / ${stats.maxHp}`;
-                
-                const hpFill = netCard.querySelector('.dm-hp-progress-fill');
-                if (hpFill) {
-                  hpFill.style.width = `${netHpPercent}%`;
-                  hpFill.style.backgroundColor = netBarColor;
-                }
-                
-                const acVal = netCard.querySelector('.net-ac-val');
-                if (acVal) {
-                  acVal.textContent = stats.ac;
-                }
+            if (!netCard) {
+              partyListContainer.insertAdjacentHTML('beforeend', netPlayerHTML);
+            } else {
+              netCard.querySelector('.dm-hp-text').textContent = `ХП: ${stats.hp} / ${stats.maxHp}`;
+              
+              const hpFill = netCard.querySelector('.dm-hp-progress-fill');
+              if (hpFill) {
+                hpFill.style.width = `${netHpPercent}%`;
+                hpFill.style.backgroundColor = netBarColor;
+              }
+              
+              const acVal = netCard.querySelector('.net-ac-val');
+              if (acVal) {
+                acVal.textContent = stats.ac;
               }
             }
-          } catch (e) {
-            console.error('[Сеть] Ошибка парсинга пакета:', e);
           }
-        };
-      });
-    }
-  });
+        } catch (e) {
+          console.error('[Сеть] Ошибка парсинга пакета:', e);
+        }
+      };
+    });
+  }
+});
 
-  // Автоматический триггер обновления ХП
-  document.addEventListener('change', (e) => {
-    if (e.target && e.target.classList.contains('hp-current-input')) {
-      window.sendCharacterNetworkData();
-    }
-  });
-})();
+// Автоматический триггер обновления ХП
+document.addEventListener('change', (e) => {
+  if (e.target && e.target.classList.contains('hp-current-input')) {
+    sendCharacterNetworkData();
+  }
+});
