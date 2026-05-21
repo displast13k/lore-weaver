@@ -1945,14 +1945,14 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             }
           }
-        } catch (e) {
-            console.error('[Сеть] Ошибка парсинга пакета:', e);
-        }
-
-// ===== АВТОМАТИЧЕСКИЕ ТРИГГЕРЫ И ОБРАБОТЧИКИ =====
-document.addEventListener('change', (e) => {
-    if (e.target && e.target.classList.contains('hp-current-input')) {
-        sendCharacterNetworkData();
+    } catch (e) {
+        console.error('[Сеть] Ошибка парсинга пакета:', e);
     }
+
+    // ===== АВТОМАТИЧЕСКИЕ ТРИГГЕРЫ И ОБРАБОТЧИКИ =====
+    document.addEventListener('change', (e) => {
+        if (e.target && e.target.classList.contains('hp-current-input')) {
+            sendCharacterNetworkData();
+        }
+    });
 });
-}
