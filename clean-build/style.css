@@ -4131,17 +4131,44 @@ body::before {
   overflow: hidden !important;
 }
 
-/* 3. Идеальная сетка внутренних панелей */
+/* * 3. Идеальная сетка внутренних панелей */
 .dm-screen-container .dm-grid {
   display: grid !important;
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* Меняем 240px на 360px для нижней строки */
+  /* Меняем 240рх на 360рх для нижней строки */
   grid-template-rows: 1fr 360px !important;    
   gap: 20px !important;
   width: 100% !important;
   height: 100% !important;
   margin: 0 !important;
 }
+
+/* 📱 Адаптация экрана ГМа для горизонтальных планшетов (iPad Air и аналоги) */
+@media (max-width: 1200px) {
+  .dm-screen-container .dm-grid {
+    grid-template-columns: 1fr 1fr !important; /* Делаем колонки партии и боя равными 50/50 */
+    grid-template-rows: 1fr 360px !important;
+    gap: 15px !important;
+  }
+}
+
+/* 📲 Адаптация экрана ГМа для вертикальных планшетов и телефонов */
+@media (max-width: 768px) {
+  .dm-screen-container .dm-grid {
+    grid-template-columns: 1fr !important; /* Выстраиваем панели строго в одну колонку */
+    grid-template-rows: auto auto 360px !important; /* Даем каждой панели место, справочник снизу */
+    overflow-y: auto !important; /* Включаем вертикальный скролл для всего экрана мастера */
+  }
+  
+  /* Разрешаем панелям занимать всю ширину в одну колонку */
+  .dm-screen-container .dm-party-panel,
+  .dm-screen-container .dm-initiative-panel,
+  .dm-screen-container .dm-compendium-panel {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+  }
+}
+
 .dm-screen-container .dm-party-panel {
   grid-column: 1 !important;
   grid-row: 1 !important;
