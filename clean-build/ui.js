@@ -1886,15 +1886,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window_gameSocket.close();
       }
 
-      // Подключаемся к бесплатному публичному WebSocket-серверу для VTT
-      window_gameSocket = new WebSocket(`wss://://piesocket.com{roomId}?api_key=VCpe6vCgSOfnH62309icC2Z9Al6gbe6p&notify=1`);
-
-      window_gameSocket.onopen = () => {
-        console.log(`[Сеть] Успешно подключено к комнате ${roomId}. Роль: ${isDM ? 'ГМ' : 'Игрок'}`);
-        // ИГРОК: Сразу закидываем свои статы ГМу при коннекте
-        if (!isDM) setTimeout(sendCharacterNetworkData, 500);
-      };
-
       window.window_gameSocket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
@@ -1958,6 +1949,5 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error('[Сеть] Ошибка парсинга пакета:', e);
         }
       };
-//});
   }, 2000);
 //}); // Закрывает глобальный DOMContentLoaded со 2-й строки ui.js
