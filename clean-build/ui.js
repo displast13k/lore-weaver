@@ -1837,5 +1837,128 @@ if (netConnectBtn) {
       }
     }
   }, 2000);
+// ==========================================
+// 📡 ГЛОБАЛЬНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER»
+// ==========================================
+let window_gameSocket = null;
 
+// Функция сбора и отправки данных Игрока на экран ГМа
+function sendCharacterNetworkData() {
+  const currentRoomId = document.getElementById('room-id')?.value.trim();
+  const currentPlayerName = document.getElementById('player-name')?.value.trim();
+  const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
+
+  if (isDM || !currentRoomId || !currentPlayerName || !window_gameSocket || window_gameSocket.readyState !== WebSocket.OPEN) return;
+
+  // Безопасно собираем текущие значения из инпутов твоего чарлиста
+  const currentHpInput = document.querySelector('.hp-current-input');
+  const shieldValueEl = document.querySelector('.shield-value');
+
+  const characterSnapshot = {
+    hp: currentHpInput ? parseInt(currentHpInput.value) || 10 : 10,
+    maxHp: typeof characterState !== 'undefined' ? characterState.hpMax || 10 : 10,
+    ac: shieldValueEl ? parseInt(shieldValueEl.textContent) || 10 : 10,
+    class: typeof characterState !== 'undefined' ? characterState.class || 'Воин' : 'Воин',
+    level: typeof characterState !== 'undefined' ? characterState.level || 1 : 1
+  };
+
+  window_gameSocket.send(JSON.stringify({
+    type: 'PLAYER_UPDATE',
+    sender: currentPlayerName,
+    payload: characterSnapshot
+  }));
+}
+
+// Перехватчик клика по твоей кнопке netConnectBtn для запуска WebSocket
+document.addEventListener('DOMContentLoaded', () => {
+  const connectBtn = document.getElementById('netConnectBtn') || document.querySelector('.net-sidebar button');
+  
+  if (connectBtn) {
+    connectBtn.addEventListener('click', () => {
+      const roomId = document.getElementById('room-id')?.value.trim();
+      const playerName = document.getElementById('player-name')?.value.trim();
+      const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
+
+      if (!roomId) return;
+
+      // Если сокет уже открыт для другой комнаты — закрываем старый
+      if (window_gameSocket) {
+        window_gameSocket.close();
+      }
+
+      // Подключаемся к бесплатному публичному WebSocket-серверу для VTT
+      window_gameSocket = new WebSocket(`wss://://piesocket.com{roomId}?api_key=VCpe6vCgSOfnH62309icC2Z9Al6gbe6p&notify=1`);
+
+      window_gameSocket.onopen = () => {
+        console.log(`[Сеть] Успешно подключено к комнате ${roomId}. Роль: ${isDM ? 'ГМ' : 'Игрок'}`);
+        // ИГРОК: Сразу закидываем свои статы ГМу при коннекте
+        if (!isDM) setTimeout(sendCharacterNetworkData, 500);
+      };
+
+      window_gameSocket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          
+          // ГМ: Принимаем пакеты обновлений от живых игроков из сети
+          if (isDM && data.type === 'PLAYER_UPDATE') {
+            const pName = data.sender;
+            const stats = data.payload;
+            const partyListContainer = document.getElementById('dm-party-list');
+            
+            if (!partyListContainer) return;
+
+            let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
+            
+            // Считаем проценты здоровья в точности по твоей формуле (строка 1509)
+            const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
+            const netBarColor = netHpPercent < 30 ? '#ff3333' : '#22aa44';
+
+            // Слепок твоей красивой верстки карточки игрока (строки 1512-1536)
+            const netPlayerHTML = `
+              <div class="dm-player-card" data-network-player="${pName}">
+                <div class="dm-player-info">
+                  <span class="dm-player-name">${pName} 🌐</span>
+                  <span class="dm-player-class">${stats.class}</span>
+                </div>
+                <div class="dm-player-hp-bar">
+                  <div class="dm-hp-text">ХП: ${stats.hp} / ${stats.maxHp}</div>
+                  <div class="dm-hp-progress-bg">
+                    <div class="dm-hp-progress-fill" style="width: ${netHpPercent}%; background-color: ${netBarColor};"></div>
+                  </div>
+                </div>
+                <div class="dm-player-stats">
+                  <div class="dm-stat-badge">
+                    <span class="label">КД</span>
+                    <span class="value net-ac-val">${stats.ac}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+
+            if (!netCard) {
+              // Если живой игрок подключился — добавляем его карточку на панель ГМа вслед за ботами
+              partyListContainer.insertAdjacentHTML('beforeend', netPlayerHTML);
+            } else {
+              // Если игрок уже на экране — реактивно обновляем его данные на лету
+              netCard.querySelector('.dm-hp-text').textContent = `ХП: ${stats.hp} / ${stats.maxHp}`;
+              netCard.querySelector('.dm-hp-progress-fill').style.width = `${netHpPercent}%`;
+              netCard.querySelector('.dm-hp-progress-fill').style.backgroundColor = netBarColor;
+              const acVal = netCard.querySelector('.net-ac-val');
+              if (acVal) acVal.textContent = stats.ac;
+            }
+          }
+        } catch (e) {
+          console.error('[Сеть] Ошибка парсинга пакета игрока:', e);
+        }
+      };
+    };
+  }
+});
+
+// Автоматический триггер: шлем данные ГМу каждый раз, когда игрок меняет ХП на экране
+document.addEventListener('change', (e) => {
+  if (e.target && e.target.classList.contains('hp-current-input')) {
+    sendCharacterNetworkData();
+  }
+});
 //}); // Закрывает глобальный DOMContentLoaded со 2-й строки ui.js
