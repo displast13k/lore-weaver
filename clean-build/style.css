@@ -4147,18 +4147,20 @@ body::before {
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
     grid-template-columns: 1fr 1fr !important; /* На планшетах панели делят ширину 50/50 */
-    /* ЖЕСТКО переопределяем высоту для планшетов: Справочник забирает 450px, верх - всё остальное */
-    grid-template-rows: 1fr 450px !important; 
+    /* Переворачиваем логику: жестко фиксируем верх на 500px, а Справочник забирает ВСЕ остальное место (1fr) */
+    grid-template-rows: 500px 1fr !important; 
     gap: 20px !important;
-    height: calc(100vh - 40px) !important;
+    height: calc(100vh - 40px) !important; /* Обрезаем сетку ровно по высоте экрана планшета */
   }
 
   /* Заставляем Справочник занять всю ширину экрана планшета под карточками */
   .dm-screen-container .dm-compendium-panel {
     grid-column: span 2 !important;
     grid-row: 2 !important;
+    height: 100% !important; /* Разрешаем панели справочника занять весь выделенный ряд */
   }
 }
+
 
 
 /* 📲 Адаптация экрана ГМа для вертикальных экранов и телефонов */
