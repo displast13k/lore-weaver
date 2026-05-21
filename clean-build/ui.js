@@ -1872,17 +1872,17 @@ window.sendCharacterNetworkData = function() {
     const message = new Paho.MQTT.Message(packet);
     message.destinationName = `lore_weaver_vtt_room_${currentRoomId}`;
     window.window_mqttClient.send(message);
-    console.log(`[Сеть ПЕРЕДАТЧИК] Отправлен пакет от Игрока (${currentPlayerName})`);
+    console.log(`%c[Сеть ПЕРЕДАТЧИК] Отправлен пакет от Игрока (${currentPlayerName})`, 'color: #00ff00; font-weight: bold;');
   } catch (e) {
     console.error('[Сеть] Ошибка отправки пакета:', e);
   }
 };
 
-// Функция инициализации сети — вызывается из твоего основного обработчика netConnectBtn!
-window.initNetworkSession = function(roomId, playerName) {
+// Универсальная функция инициализации сети MQTT
+window.initNetworkSession = function(roomId, playerName, isDM) {
   if (!roomId) return;
   if (typeof Paho === 'undefined') {
-    console.error('[Сеть] Библиотека Paho MQTT не найдена на странице!');
+    console.error('%c[Сеть] КРИТИЧЕСКАЯ ОШИБКА: Библиотека Paho MQTT не найдена на странице! Проверьте index.html', 'color: #ff0000; font-weight: bold;');
     return;
   }
 
@@ -1898,12 +1898,12 @@ window.initNetworkSession = function(roomId, playerName) {
       const data = JSON.parse(message.payloadString);
       const partyListContainer = document.getElementById('dm-party-list');
       
-      // 🎯 МАГИЯ: Если на экране есть dm-party-list, значит это вкладка ГМа — принимаем игроков!
+      // Если на экране есть dm-party-list, значит это вкладка ГМа — принимаем игроков!
       if (partyListContainer && data.type === 'PLAYER_UPDATE') {
         const pName = data.sender;
         const stats = data.payload;
         
-        console.log(`[Сеть ПРИЁМНИК ГМА] Успешно получен пакет от игрока: ${pName}`, stats);
+        console.log(`%c[Сеть ПРИЁМНИК ГМА] Успешно получен пакет от игрока: ${pName}`, 'color: #00ffff;', stats);
 
         let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
         const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
@@ -1952,12 +1952,11 @@ window.initNetworkSession = function(roomId, playerName) {
 
   window.window_mqttClient.connect({
     onSuccess: () => {
-      console.log(`[Сеть] Сессия запущена. Топик комнаты: lore_weaver_vtt_room_${roomId}`);
+      console.log(`%c[Сеть] СЕССИЯ УСПЕШНО ЗАПУЩЕНА! Подключено к HiveMQ SSL. Топик: lore_weaver_vtt_room_${roomId}`, 'color: #00ff00; font-weight: bold;');
       window.window_mqttClient.subscribe(`lore_weaver_vtt_room_${roomId}`);
 
       // ИГРОК: Даем сети 300мс прогреться и принудительно шлем первый пакет ГМу
-      const partyListContainer = document.getElementById('dm-party-list');
-      if (!partyListContainer && playerName) {
+      if (!isDM && playerName) {
         setTimeout(() => {
           if (typeof window.sendCharacterNetworkData === 'function') window.sendCharacterNetworkData();
         }, 400);
@@ -1968,7 +1967,25 @@ window.initNetworkSession = function(roomId, playerName) {
   });
 };
 
-// 🔥 УЛЬТИМАТИВНЫЙ ТРИГГЕР: Кликаешь в любое место экрана игрока — обновленные ХП летят ГМу
+// 🎯 СИЛОВОЙ ПЕРЕХВАТЧИК КЛИКА: Запускает сокет принудительно и ГМу, и Игроку
+document.addEventListener('click', (e) => {
+  // Проверяем, кликнули ли именно на кнопку подключения (по ID или классам)
+  if (e.target && (e.target.id === 'netConnectBtn' || e.target.textContent.includes('ПОДКЛЮЧИТЬСЯ'))) {
+    // Даем твоему старому коду 100мс отработать и запустить смену экранов
+    setTimeout(() => {
+      const roomId = document.getElementById('room-id')?.value.trim();
+      const playerName = document.getElementById('player-name')?.value.trim();
+      const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
+
+      if (roomId) {
+        console.log(`[Сеть] Силовой запуск сессии для комнаты: ${roomId}`);
+        window.initNetworkSession(roomId, playerName, isDM);
+      }
+    }, 100);
+  }
+});
+
+// 🔥 УЛЬТИМАТИВНЫЙ РЕАКТИВНЫЙ ТРИГГЕР: ловим любые клики на листе игрока для апдейта ХП
 document.addEventListener('click', () => {
   setTimeout(() => {
     if (typeof window.sendCharacterNetworkData === 'function') {
