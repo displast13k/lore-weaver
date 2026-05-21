@@ -1,10 +1,10 @@
 // ==========================================
-// 📡 ИЗОЛИРОВАННЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER» (MQTT)
+// 📡 ИЗОЛИРОВАННЫЙ РЕАКТИВНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER»
 // ==========================================
 window.window_mqttClient = null;
 window.currentConnectedRoom = null;
 
-// Функция ИГРОКА: собирает статы из глобального стейта или инпутов
+// Функция ИГРОКА: собирает статы напрямую по тексту на экране
 window.sendCharacterNetworkData = function() {
   const roomIdInput = document.getElementById('room-id');
   const playerNameInput = document.getElementById('player-name');
@@ -16,7 +16,6 @@ window.sendCharacterNetworkData = function() {
   // Если это экран ГМа или нет коннекта/комнаты/имени — отмена
   if (partyListContainer || !currentRoomId || !currentPlayerName || !window.window_mqttClient || !window.window_mqttClient.isConnected()) return;
 
-  // Берем ХП и КД из глобального состояния твоего движка (characterState)
   let currentHp = 10;
   let maxHp = 10;
   let armorClass = 10;
@@ -29,15 +28,6 @@ window.sendCharacterNetworkData = function() {
     if (characterState.ac !== undefined) armorClass = characterState.ac;
     if (characterState.class) charClass = characterState.class;
     if (characterState.level) charLevel = parseInt(characterState.level) || 1;
-  } else {
-    // Резервный сбор по селекторам из ui.js
-    const hpInput = document.querySelector('.hp-current-input') || document.getElementById('current-hp');
-    const hpMaxInput = document.querySelector('.hp-max-input') || document.getElementById('max-hp');
-    const acInput = document.querySelector('.shield-value') || document.getElementById('armor-class');
-
-    if (hpInput) currentHp = parseInt(hpInput.value) || parseInt(hpInput.textContent) || 10;
-    if (hpMaxInput) maxHp = parseInt(hpMaxInput.value) || parseInt(hpMaxInput.textContent) || 10;
-    if (acInput) armorClass = parseInt(acInput.textContent) || parseInt(acInput.value) || 10;
   }
 
   const packet = JSON.stringify({
@@ -50,7 +40,7 @@ window.sendCharacterNetworkData = function() {
     const message = new Paho.MQTT.Message(packet);
     message.destinationName = `lw_vtt_global_room_${currentRoomId}`;
     window.window_mqttClient.send(message);
-    console.log(`%c[Сеть ПЕРЕДАТЧИК] Данные отправлены ГМу: ${currentHp}/${maxHp} ХП`, 'color: #00ff00; font-weight: bold;');
+    console.log(`%c[Сеть ПЕРЕДАТЧИК] Данные игрока отправлены ГМу: ${currentHp}/${maxHp} ХП`, 'color: #00ff00; font-weight: bold;');
   } catch (e) {
     console.error('[Сеть] Ошибка отправки пакета:', e);
   }
@@ -77,7 +67,6 @@ window.initNetworkSession = function(roomId, playerName, isDM) {
       const data = JSON.parse(message.payloadString);
       const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
       
-      // ГМ: Принимаем пакеты обновлений от живых игроков
       if (partyListContainer && data.type === 'PLAYER_UPDATE') {
         const pName = data.sender;
         const stats = data.payload;
@@ -134,8 +123,8 @@ window.initNetworkSession = function(roomId, playerName, isDM) {
       console.log(`%c[Сеть] ПОДКЛЮЧЕНО К СЕРВЕРУ! Комната: ${roomId}`, 'color: #00ff00; font-weight: bold;');
       window.window_mqttClient.subscribe(`lw_vtt_global_room_${roomId}`);
 
-      // ИГРОК: Принудительно шлем первый пакет ГМу при подключении
-      if (!isDM && playerName) {
+      const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
+      if (!partyListContainer && playerName) {
         setTimeout(window.sendCharacterNetworkData, 400);
       }
     },
@@ -144,26 +133,32 @@ window.initNetworkSession = function(roomId, playerName, isDM) {
   });
 };
 
-// 🎯 СИЛОВОЙ ВСЕЯДНЫЙ ПЕРЕХВАТЧИК КЛИКА: Запускает сокет ГМу и Игроку при любом нажатии на кнопку коннекта
+// 🎯 ПЕРЕХВАТ НА СТАДИИ ПОГРУЖЕНИЯ (Флаг true в конце): Обходит любой stopPropagation() в твоем ui.js!
 document.addEventListener('click', (e) => {
-  // Метод closest найдет кнопку, даже если кликнули по тексту внутри нее!
   const connectBtn = e.target.closest('#netConnectBtn') || e.target.closest('.net-sidebar button') || (e.target.textContent && e.target.textContent.includes('ПОДКЛЮЧИТЬСЯ') ? e.target : null);
   
   if (connectBtn) {
-    // Даем оригинальному коду ui.js 150мс, чтобы он переключил роли и интерфейс
-    setTimeout(() => {
-      const roomIdInput = document.getElementById('room-id');
-      const playerNameInput = document.getElementById('player-name');
-      const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
+    // Мгновенно выдергиваем значения до того, как поток успеет выполниться
+    const roomIdInput = document.getElementById('room-id');
+    const playerNameInput = document.getElementById('player-name');
+    const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
 
-      const roomId = roomIdInput?.value.trim();
-      const playerName = playerNameInput ? playerNameInput.value.trim() : "Мастер";
-      const isDM = !!partyListContainer;
+    const roomId = roomIdInput?.value.trim();
+    const playerName = playerNameInput ? playerNameInput.value.trim() : "Мастер";
+    const isDM = !!partyListContainer;
 
-      if (roomId) {
-        console.log(`[Сеть] Железный перехват кнопки коннекта. Запуск комнаты: ${roomId}`);
-        window.initNetworkSession(roomId, playerName, isDM);
-      }
-    }, 150);
+    if (roomId) {
+      console.log(`[Сеть] Перехват клика на стадии погружения. Запуск комнаты: ${roomId}`);
+      window.initNetworkSession(roomId, playerName, isDM);
+    }
   }
+}, true); // <--- ЭТОТ ФЛАГ TRUE ПРОБЬЕТ ЛЮБУЮ БЛОКИРОВКУ КЛИКА!
+
+// Реактивный триггер апдейта ХП на клики по листу персонажа
+document.addEventListener('click', () => {
+  setTimeout(() => {
+    if (typeof window.sendCharacterNetworkData === 'function') {
+      window.sendCharacterNetworkData();
+    }
+  }, 100);
 });
