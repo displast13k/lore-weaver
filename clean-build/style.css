@@ -4135,7 +4135,7 @@ body::before {
 .dm-screen-container .dm-grid {
   display: grid !important;
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* На ПК: верхний ряд свободный (1fr), а Справочник аккуратно ложится в строку 360px */
+  /* На ПК: верхний ряд свободный (1fr), справочник занимает стабильные 360px */
   grid-template-rows: 1fr 360px !important;    
   gap: 20px !important;
   width: 100% !important;
@@ -4143,47 +4143,35 @@ body::before {
   margin: 0 !important;
 }
 
-/* Координаты блоков ГМа на ПК: Панель партии слева сверху */
+/* На ПК: Панель партии слева сверху */
 .dm-screen-container .dm-party-panel {
   grid-column: 1 !important;
   grid-row: 1 !important;
 }
 
-/* Координаты блоков ГМа на ПК: Справочник занимает ВСЮ левую нижнюю часть */
-.dm-screen-container .dm-compendium-panel {
-  grid-column: 1 !important;
-  grid-row: 2 !important;
-  height: 100% !important;
-}
-
-/* Координаты блоков ГМа на ПК: Инициатива ровно держит весь правый борт от верха до низа */
+/* На ПК: Инициатива справа сверху (занимает только первый ряд!) */
 .dm-screen-container .dm-initiative-panel {
   grid-column: 2 !important;
-  grid-row: 1 / span 2 !important;
+  grid-row: 1 !important;
+}
+
+/* На ПК: Справочник занимает ВЕСЬ нижний ряд на всю ширину под обеими панелями! */
+.dm-screen-container .dm-compendium-panel {
+  grid-column: span 2 !important; /* Вот она, магия широкого экрана! */
+  grid-row: 2 !important;
+  height: 100% !important;
 }
 
 /* 📱 Адаптация высоты ТОЛЬКО для планшетов (экраны до 1400px, вроде iPad Pro) */
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
     grid-template-columns: 1.2fr 0.8fr !important; 
-    /* На планшете ужимаем верх, давая Справочнику комфортные 420px высоты, чтобы влезало описание */
+    /* На планшете ужимаем верх, давая Справочнику комфортные 420px высоты, чтобы влезало описание атак */
     grid-template-rows: 1fr 420px !important; 
     gap: 20px !important;
     height: calc(100vh - 40px) !important;
   }
 }
-/* Общие стили блоков ГМа */
-.dm-card {
-  background: rgba(12, 3, 3, 0.85) !important; /* Плотный темный фон с прозрачностью */
-  border: 1px solid #4a1111 !important;       /* Кроваво-красная рамка */
-  border-radius: 4px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  backdrop-filter: blur(6px) !important;       /* Эффект матового стекла */
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
-}
-
 .dm-card-header {
   background: #220707 !important;
   padding: 14px 20px !important;
