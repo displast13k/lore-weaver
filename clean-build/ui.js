@@ -1835,7 +1835,7 @@ if (netConnectBtn) {
     }
   }, 2000);
 // ==========================================
-// 📡 ГЛОБАЛЬНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER» (MQTT через Paho CDN)
+// 📡 ГЛОБАЛЬНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER» (MQTT)
 // ==========================================
 window.window_mqttClient = null;
 
@@ -1843,9 +1843,10 @@ window.window_mqttClient = null;
 window.sendCharacterNetworkData = function() {
   const currentRoomId = document.getElementById('room-id')?.value.trim();
   const currentPlayerName = document.getElementById('player-name')?.value.trim();
-  const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
+  const partyListContainer = document.getElementById('dm-party-list');
 
-  if (isDM || !currentRoomId || !currentPlayerName || !window.window_mqttClient || !window.window_mqttClient.isConnected()) return;
+  // Если на этой вкладке открыт экран ГМа (есть dm-party-list), игроку отсюда слать ничего не нужно
+  if (partyListContainer || !currentRoomId || !currentPlayerName || !window.window_mqttClient || !window.window_mqttClient.isConnected()) return;
 
   let currentHp = 10;
   let maxHp = 10;
@@ -1859,148 +1860,115 @@ window.sendCharacterNetworkData = function() {
     if (characterState.ac !== undefined) armorClass = parseInt(characterState.ac) || 10;
     if (characterState.class !== undefined) charClass = characterState.class;
     if (characterState.level !== undefined) charLevel = parseInt(characterState.level) || 1;
-  } else {
-    const hpEl = document.querySelector('.hp-current-input') || document.querySelector('.hp-value');
-    if (hpEl) currentHp = parseInt(hpEl.value) || parseInt(hpEl.textContent) || 10;
-    const acEl = document.querySelector('.shield-value') || document.querySelector('.ac-value');
-    if (acEl) armorClass = parseInt(acEl.textContent) || parseInt(acEl.value) || 10;
   }
 
-  // Упаковываем данные в JSON-строку
   const packet = JSON.stringify({
     type: 'PLAYER_UPDATE',
     sender: currentPlayerName,
     payload: { hp: currentHp, maxHp: maxHp, ac: armorClass, class: charClass, level: charLevel }
   });
 
-  // Публикуем сообщение в изолированный топик нашей комнаты на сервере HiveMQ
   try {
     const message = new Paho.MQTT.Message(packet);
     message.destinationName = `lore_weaver_vtt_room_${currentRoomId}`;
     window.window_mqttClient.send(message);
-    console.log('[Сеть] Пакет характеристик отправлен ГМу.');
+    console.log(`[Сеть ПЕРЕДАТЧИК] Отправлен пакет от Игрока (${currentPlayerName})`);
   } catch (e) {
     console.error('[Сеть] Ошибка отправки пакета:', e);
   }
 };
 
-// Глобальный перехватчик кликов по кнопке подключения
-document.addEventListener('DOMContentLoaded', () => {
-  const connectBtn = document.getElementById('netConnectBtn') || document.querySelector('.net-sidebar button');
-  
-  if (connectBtn) {
-    connectBtn.addEventListener('click', () => {
-      setTimeout(() => {
-        const roomId = document.getElementById('room-id')?.value.trim();
-        const playerName = document.getElementById('player-name')?.value.trim();
-        const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
-
-        if (!roomId) return;
-
-        // Если библиотека Paho не загрузилась из CDN — выводим ошибку
-        if (typeof Paho === 'undefined') {
-          alert('Сетевой движок не успел загрузиться. Проверьте index.html!');
-          return;
-        }
-
-        if (window.window_mqttClient && window.window_mqttClient.isConnected()) {
-          window.window_mqttClient.disconnect();
-        }
-
-        // Создаем уникальный клиент-ID для этой вкладки браузера
-        const clientId = 'lw_client_' + Math.random().toString(36).substring(2, 10);
-        
-        // Подключаемся к промышленному защищенному SSL-серверу HiveMQ (разрешен на GitHub Pages)
-        window.window_mqttClient = new Paho.MQTT.Client('://hivemq.com', 8884, '/mqtt', clientId);
-
-        window.window_mqttClient.onMessageArrived = (message) => {
-          try {
-            const data = JSON.parse(message.payloadString);
-            
-            // ГМ: Ловим пакеты обновлений от живых игроков из нашего топика сессии
-            if (isDM && data.type === 'PLAYER_UPDATE') {
-              const pName = data.sender;
-              const stats = data.payload;
-              
-              const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list') || document.querySelector('.dm-party-panel .dm-card-body');
-              if (!partyListContainer) return;
-
-              if (partyListContainer.textContent.includes('Ожидание подключения')) partyListContainer.innerHTML = '';
-              const placeholder = partyListContainer.querySelector('.dm-empty-placeholder');
-              if (placeholder) placeholder.remove();
-
-              let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
-              
-              const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
-              const netBarColor = netHpPercent < 30 ? '#ff3333' : '#22aa44';
-
-              const netPlayerHTML = `
-                <div class="dm-player-card" data-network-player="${pName}">
-                  <div class="dm-player-info">
-                    <span class="dm-player-name">${pName} 🌐</span>
-                    <span class="dm-player-class">${stats.class} / ${stats.level} ур.</span>
-                  </div>
-                  <div class="dm-player-hp-bar">
-                    <div class="dm-hp-text">ХП: ${stats.hp} / ${stats.maxHp}</div>
-                    <div class="dm-hp-progress-bg">
-                      <div class="dm-hp-progress-fill" style="width: ${netHpPercent}%; background-color: ${netBarColor};"></div>
-                    </div>
-                  </div>
-                  <div class="dm-player-stats">
-                    <div class="dm-stat-badge">
-                      <span class="label">КД</span>
-                      <span class="value net-ac-val">${stats.ac}</span>
-                    </div>
-                  </div>
-                </div>
-              `;
-
-              if (!netCard) {
-                partyListContainer.insertAdjacentHTML('beforeend', netPlayerHTML);
-              } else {
-                netCard.querySelector('.dm-hp-text').textContent = `ХП: ${stats.hp} / ${stats.maxHp}`;
-                const hpFill = netCard.querySelector('.dm-hp-progress-fill');
-                if (hpFill) {
-                  hpFill.style.width = `${netHpPercent}%`;
-                  hpFill.style.backgroundColor = netBarColor;
-                }
-                const acVal = netCard.querySelector('.net-ac-val');
-                if (acVal) acVal.textContent = stats.ac;
-              }
-            }
-          } catch (e) {
-            // Игнорируем фоновый шум брокера
-          }
-        };
-
-        // Запуск сессии и подписка на изолированный топик комнаты
-        window.window_mqttClient.connect({
-          onSuccess: () => {
-            console.log(`[Сеть] Успешно подключено к HiveMQ. Комната: ${roomId}`);
-            
-            // Подписываемся на топик нашей комнаты
-            window.window_mqttClient.subscribe(`lore_weaver_vtt_room_${roomId}`);
-
-            // ИГРОК: Даем сети 300мс прогреться и принудительно шлем пакет ГМу
-            if (!isDM && playerName) {
-              setTimeout(() => {
-                if (typeof window.sendCharacterNetworkData === 'function') {
-                  window.sendCharacterNetworkData();
-                }
-              }, 300);
-            }
-          },
-          onFailure: (err) => {
-            console.error('[Сеть] Ошибка подключения к брокеру:', err);
-          },
-          useSSL: true // Намертво пробивает защиту Mixed Content на GitHub Pages!
-        });
-      }, 100);
-    });
+// Функция инициализации сети — вызывается из твоего основного обработчика netConnectBtn!
+window.initNetworkSession = function(roomId, playerName) {
+  if (!roomId) return;
+  if (typeof Paho === 'undefined') {
+    console.error('[Сеть] Библиотека Paho MQTT не найдена на странице!');
+    return;
   }
-});
 
-// 🔥 УЛЬТИМАТИВНЫЙ ТРИГГЕР: ловим ЛЮБЫЕ клики на листе игрока и шлем пакет ГМу
+  if (window.window_mqttClient && window.window_mqttClient.isConnected()) {
+    window.window_mqttClient.disconnect();
+  }
+
+  const clientId = 'lw_client_' + Math.random().toString(36).substring(2, 10);
+  window.window_mqttClient = new Paho.MQTT.Client('://hivemq.com', 8884, '/mqtt', clientId);
+
+  window.window_mqttClient.onMessageArrived = (message) => {
+    try {
+      const data = JSON.parse(message.payloadString);
+      const partyListContainer = document.getElementById('dm-party-list');
+      
+      // 🎯 МАГИЯ: Если на экране есть dm-party-list, значит это вкладка ГМа — принимаем игроков!
+      if (partyListContainer && data.type === 'PLAYER_UPDATE') {
+        const pName = data.sender;
+        const stats = data.payload;
+        
+        console.log(`[Сеть ПРИЁМНИК ГМА] Успешно получен пакет от игрока: ${pName}`, stats);
+
+        let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
+        const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
+        const netBarColor = netHpPercent < 30 ? '#ff3333' : '#22aa44';
+
+        const netPlayerHTML = `
+          <div class="dm-player-card" data-network-player="${pName}">
+            <div class="dm-player-info">
+              <span class="dm-player-name">${pName} 🌐</span>
+              <span class="dm-player-class">${stats.class} / ${stats.level} ур.</span>
+            </div>
+            <div class="dm-player-hp-bar">
+              <div class="dm-hp-text">ХП: ${stats.hp} / ${stats.maxHp}</div>
+              <div class="dm-hp-progress-bg">
+                <div class="dm-hp-progress-fill" style="width: ${netHpPercent}%; background-color: ${netBarColor};"></div>
+              </div>
+            </div>
+            <div class="dm-player-stats">
+              <div class="dm-stat-badge">
+                <span class="label">КД</span>
+                <span class="value net-ac-val">${stats.ac}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        if (!netCard) {
+          partyListContainer.insertAdjacentHTML('beforeend', netPlayerHTML);
+          console.log(`[Сеть ПРИЁМНИК ГМА] Карточка ${pName} успешно добавлена на панель.`);
+        } else {
+          netCard.querySelector('.dm-hp-text').textContent = `ХП: ${stats.hp} / ${stats.maxHp}`;
+          const hpFill = netCard.querySelector('.dm-hp-progress-fill');
+          if (hpFill) {
+            hpFill.style.width = `${netHpPercent}%`;
+            hpFill.style.backgroundColor = netBarColor;
+          }
+          const acVal = netCard.querySelector('.net-ac-val');
+          if (acVal) acVal.textContent = stats.ac;
+          console.log(`[Сеть ПРИЁМНИК ГМА] Данные карточки ${pName} реактивно обновлены.`);
+        }
+      }
+    } catch (e) {
+      console.error('[Сеть] Ошибка парсинга входящего сообщения:', e);
+    }
+  };
+
+  window.window_mqttClient.connect({
+    onSuccess: () => {
+      console.log(`[Сеть] Сессия запущена. Топик комнаты: lore_weaver_vtt_room_${roomId}`);
+      window.window_mqttClient.subscribe(`lore_weaver_vtt_room_${roomId}`);
+
+      // ИГРОК: Даем сети 300мс прогреться и принудительно шлем первый пакет ГМу
+      const partyListContainer = document.getElementById('dm-party-list');
+      if (!partyListContainer && playerName) {
+        setTimeout(() => {
+          if (typeof window.sendCharacterNetworkData === 'function') window.sendCharacterNetworkData();
+        }, 400);
+      }
+    },
+    onFailure: (err) => console.error('[Сеть] Ошибка MQTT коннекта:', err),
+    useSSL: true
+  });
+};
+
+// 🔥 УЛЬТИМАТИВНЫЙ ТРИГГЕР: Кликаешь в любое место экрана игрока — обновленные ХП летят ГМу
 document.addEventListener('click', () => {
   setTimeout(() => {
     if (typeof window.sendCharacterNetworkData === 'function') {
