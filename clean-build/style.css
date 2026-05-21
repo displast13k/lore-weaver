@@ -4131,31 +4131,42 @@ body::before {
   overflow: hidden !important;
 }
 
-/* * 3. Идельная сетка внутренних панелей */
+/* * 3. Идеальная сетка внутренних панелей */
 .dm-screen-container .dm-grid {
   display: grid !important;
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* На ПК и планшетах: верх свободный под игроков, справочник строго 360px */
-  grid-template-rows: 1fr 360px !important;    
+  /* На ПК: верх свободный (550px), справочник забирает весь остаток (1fr) */
+  grid-template-rows: 550px 1fr !important;    
   gap: 20px !important;
   width: 100% !important;
-  height: calc(100vh - 60px) !important; /* Жестко держим рамки экрана */
+  height: calc(100vh - 60px) !important;
   margin: 0 !important;
 }
-/* 📲 Адаптация экрана ГМа для вертикальных экранов и телефонов */
-@media (max-width: 768px) {
-  .dm-screen-container .dm-grid {
-    grid-template-columns: 1fr !important; 
-    grid-template-rows: auto auto 450px !important; 
-    overflow-y: auto !important; 
-  }
+
+/* Ограничиваем верхние панели */
+.dm-screen-container .dm-party-panel,
+.dm-screen-container .dm-initiative-panel {
+  max-height: 550px !important;
+  min-height: auto !important;
+  height: 100% !important;
 }
+
+/* Справочник на ПК */
+.dm-screen-container .dm-compendium-panel {
+  height: 100% !important;
+  min-height: auto !important;
+}
+
+/* 📱 Адаптация высоты ТОЛЬКО для планшетов (экраны до 1400px, вроде iPad) */
+@media (max-width: 1400px) {
+  .dm-screen-container .dm-grid {
+    /* На планшете ужимаем верх до 420px, отдавая весь низ справочнику! */
+    grid-template-rows: 420px 1fr !important; 
+  }
   
   .dm-screen-container .dm-party-panel,
-  .dm-screen-container .dm-initiative-panel,
-  .dm-screen-container .dm-compendium-panel {
-    grid-column: 1 !important;
-    grid-row: auto !important;
+  .dm-screen-container .dm-initiative-panel {
+    max-height: 420px !important;
   }
 }
 
