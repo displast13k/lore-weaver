@@ -149,7 +149,7 @@ const observer = new MutationObserver(() => {
   // 1. Авто-подключение: если в DOM появился текст "Подключено к" — выдергиваем ID комнаты и запускаем сеть
   if (!window.window_mqttClient || !window.window_mqttClient.isConnected()) {
     const statusText = document.body.innerText;
-    const statusMatch = statusText.match(/Подключено\s+к\s+([a-zA-Z0-9а-яА-Я_]+)/i) || statusText.match(/Подключено\s*:\s*([a-zA-Z0-9а-яА-Я_]+)/i);
+    const statusMatch = statusText.match(/Подключен[оа]?\s+к\s+([a-zA-Z0-9а-яА-Я_]+)/i) || statusText.match(/Подключен[оа]?\s*:\s*([a-zA-Z0-9а-яА-Я_]+)/i);
     
     if (statusMatch && roomIdInput && roomIdInput.value) {
       const activeRoom = statusMatch[1];
