@@ -1891,10 +1891,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isDM) setTimeout(sendCharacterNetworkData, 500);
       };
 
-      window_gameSocket.onmessage = (event) => {
+      window.window_gameSocket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
           
+          // ГМ: Принимаем пакеты обновлений от живых игроков из сети
           if (isDM && data.type === 'PLAYER_UPDATE') {
             const pName = data.sender;
             const stats = data.payload;
@@ -1904,9 +1905,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
             
+            // Считаем проценты в точности по твоей формуле со строки 1509!
             const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
             const netBarColor = netHpPercent < 30 ? '#ff3333' : '#22aa44';
 
+            // Идеальный слепок твоей красивой вёрстки карточки
             const netPlayerHTML = `
               <div class="dm-player-card" data-network-player="${pName}">
                 <div class="dm-player-info">
@@ -1929,8 +1932,10 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             if (!netCard) {
+              // Добавляем карточку живого игрока на экран мастера вслед за ботами
               partyListContainer.insertAdjacentHTML('beforeend', netPlayerHTML);
             } else {
+              // Если игрок уже на экране — реактивно обновляем его данные на лету
               netCard.querySelector('.dm-hp-text').textContent = `ХП: ${stats.hp} / ${stats.maxHp}`;
               
               const hpFill = netCard.querySelector('.dm-hp-progress-fill');
@@ -1945,14 +1950,17 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             }
           }
-    } catch (e) {
-        console.error('[Сеть] Ошибка парсинга пакета:', e);
-    }
+        } catch (e) {
+          console.error('[Сеть] Ошибка парсинга пакета:', e);
+        }
+      };
+    });
+  }
 });
 
-// ===== АВТОМАТИЧЕСКИЕ ТРИГГЕРЫ И ОБРАБОТЧИКИ =====
+// Автоматический триггер обновления ХП
 document.addEventListener('change', (e) => {
-    if (e.target && e.target.classList.contains('hp-current-input')) {
-        sendCharacterNetworkData();
-    }
+  if (e.target && e.target.classList.contains('hp-current-input')) {
+    sendCharacterNetworkData();
+  }
 });
