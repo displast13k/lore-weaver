@@ -4134,8 +4134,9 @@ body::before {
 /* * 3. Идельная сетка внутренних панелей */
 .dm-screen-container .dm-grid {
   display: grid !important;
+  /* На ПК: две колонки делят экран (1.2fr и 0.8fr) */
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* На ПК: верх свободный (1fr), справочник аккуратно занимает 360px */
+  /* На ПК: верх свободный (1fr), а Справочник занимает твою идеальную строку в 360px */
   grid-template-rows: 1fr 360px !important;    
   gap: 20px !important;
   width: 100% !important;
@@ -4143,28 +4144,41 @@ body::before {
   margin: 0 !important;
 }
 
+/* На ПК Справочник занимает первую колонку первого ряда, как у тебя и было */
+.dm-screen-container .dm-compendium-panel {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+}
+
 /* 📱 Адаптация высоты ТОЛЬКО для планшетов (экраны до 1400px, вроде iPad Pro) */
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
-    grid-template-columns: 1.2fr 0.8fr !important; /* На планшетах сохраняем каноничные пропорции колонок */
-    grid-template-rows: 1fr 400px !important; /* На планшете приподнимаем справочник до 400px, чтобы влезало описание */
-    gap: 15px !important;
+    grid-template-columns: 1.2fr 0.8fr !important; 
+    /* На планшете усаживаем справочник в зеленую рамку, приподнимая до 430px */
+    grid-template-rows: 1fr 430px !important; 
+    gap: 20px !important;
     height: calc(100vh - 40px) !important;
   }
   
-  /* Возвращаем Справочник на его законное место в первую колонку под партию! */
+  /* На планшете заставляем Справочник сидеть ровно в левой колонке под игроками */
   .dm-screen-container .dm-compendium-panel {
-    grid-column: 1 !important; /* Он снова сидит строго слева и не растягивается на весь экран */
+    grid-column: 1 !important;
     grid-row: 2 !important;
     height: 100% !important;
   }
 
-  /* Панель партии сидит сверху в первой колонке */
+  /* Панель партии на планшете */
   .dm-screen-container .dm-party-panel {
     grid-column: 1 !important;
     grid-row: 1 !important;
   }
 
+  /* Растягиваем инициативу на планшете, чтобы она не ломала ПК-версию */
+  .dm-screen-container .dm-initiative-panel {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important; 
+  }
+}
   /* Трекер инициативы сидит справа на всю высоту двух рядов */
   .dm-screen-container .dm-initiative-panel {
     grid-column: 2 !important;
