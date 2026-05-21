@@ -4134,9 +4134,8 @@ body::before {
 /* * 3. Идельная сетка внутренних панелей */
 .dm-screen-container .dm-grid {
   display: grid !important;
-  /* На ПК: две колонки делят экран (1.2fr и 0.8fr) */
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* На ПК: верх свободный (1fr), а Справочник занимает твою идеальную строку в 360px */
+  /* На ПК: верхний ряд свободный (1fr), а Справочник аккуратно ложится в строку 360px */
   grid-template-rows: 1fr 360px !important;    
   gap: 20px !important;
   width: 100% !important;
@@ -4144,48 +4143,35 @@ body::before {
   margin: 0 !important;
 }
 
-/* На ПК Справочник занимает первую колонку первого ряда, как у тебя и было */
+/* Координаты блоков ГМа на ПК: Панель партии слева сверху */
+.dm-screen-container .dm-party-panel {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+}
+
+/* Координаты блоков ГМа на ПК: Справочник занимает ВСЮ левую нижнюю часть */
 .dm-screen-container .dm-compendium-panel {
   grid-column: 1 !important;
   grid-row: 2 !important;
+  height: 100% !important;
+}
+
+/* Координаты блоков ГМа на ПК: Инициатива ровно держит весь правый борт от верха до низа */
+.dm-screen-container .dm-initiative-panel {
+  grid-column: 2 !important;
+  grid-row: 1 / span 2 !important;
 }
 
 /* 📱 Адаптация высоты ТОЛЬКО для планшетов (экраны до 1400px, вроде iPad Pro) */
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
     grid-template-columns: 1.2fr 0.8fr !important; 
-    /* На планшете усаживаем справочник в зеленую рамку, приподнимая до 430px */
-    grid-template-rows: 1fr 430px !important; 
+    /* На планшете ужимаем верх, давая Справочнику комфортные 420px высоты, чтобы влезало описание */
+    grid-template-rows: 1fr 420px !important; 
     gap: 20px !important;
     height: calc(100vh - 40px) !important;
   }
-  
-  /* На планшете заставляем Справочник сидеть ровно в левой колонке под игроками */
-  .dm-screen-container .dm-compendium-panel {
-    grid-column: 1 !important;
-    grid-row: 2 !important;
-    height: 100% !important;
-  }
-
-  /* Панель партии на планшете */
-  .dm-screen-container .dm-party-panel {
-    grid-column: 1 !important;
-    grid-row: 1 !important;
-  }
-
-  /* Растягиваем инициативу на планшете, чтобы она не ломала ПК-версию */
-  .dm-screen-container .dm-initiative-panel {
-    grid-column: 2 !important;
-    grid-row: 1 / span 2 !important; 
-  }
 }
-  /* Трекер инициативы сидит справа на всю высоту двух рядов */
-  .dm-screen-container .dm-initiative-panel {
-    grid-column: 2 !important;
-    grid-row: 1 / span 2 !important; /* Растягиваем инициативу вертикально, как у тебя и было */
-  }
-}
-
 /* Общие стили блоков ГМа */
 .dm-card {
   background: rgba(12, 3, 3, 0.85) !important; /* Плотный темный фон с прозрачностью */
