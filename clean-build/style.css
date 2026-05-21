@@ -4135,11 +4135,11 @@ body::before {
 .dm-screen-container .dm-grid {
   display: grid !important;
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* Магия: верхний ряд всегда 500px, а Справочник снизу всегда 320px — железный баланс! */
-  grid-template-rows: 500px 320px !important;    
+  /* На ПК: верх свободный (1fr), справочник аккуратно лежит внизу (360px) */
+  grid-template-rows: 1fr 360px !important;    
   gap: 20px !important;
   width: 100% !important;
-  height: auto !important; /* Отпускаем высоту, чтобы блоки не сжимались браузером планшета */
+  height: calc(100vh - 60px) !important; /* Сетка ВСЕГДА растянута до низа экрана */
   margin: 0 !important;
 }
 
@@ -4161,24 +4161,21 @@ body::before {
 }
 
 .dm-screen-container .dm-compendium-panel {
-  grid-column: span 2 !important; /* Растягиваем справочник на всю ширину под верхними блоками */
+  grid-column: span 2 !important; 
   grid-row: 2 !important;
   background: rgba(20, 5, 5, 0.85) !important;
   border: 1px solid #4a1111 !important;
   height: 100% !important;
 }
 
-/* 📱 Адаптация под планшеты (больше не ломает пропорции, просто убирает лишние отступы) */
+/* 📱 Адаптация высоты ТОЛЬКО для планшетов (экраны до 1400px, вроде iPad Pro) */
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
-    gap: 15px !important; /* Чуть уменьшаем зазоры на планшетах для компактности */
-  }
-}
-
-  /* Принудительно заставляем внутренний блок справочника занять все выделенные 280 пикселей */
-  .dm-screen-container .dm-compendium-panel {
-    height: 100% !important;
-    min-height: 280px !important;
+    grid-template-columns: 1.2fr 0.8fr !important; 
+    /* Магия для планшета: Справочник забирает стабильные 42% от ВСЕЙ высоты экрана, поднимая линию вверх! */
+    grid-template-rows: 1fr 42vh !important; 
+    gap: 15px !important;
+    height: calc(100vh - 40px) !important; /* Растягиваем макет на планшете до самого низа */
   }
 }
 .dm-card-header {
