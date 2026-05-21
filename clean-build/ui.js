@@ -1839,7 +1839,7 @@ if (netConnectBtn) {
 // ==========================================
 window.window_gameSocket = null;
 
-// Функция ИГРОКА: Железный сбор данных напрямую из глобального состояния движка
+// Функция ИГРОКА: Гарантированный сбор данных из characterState
 window.sendCharacterNetworkData = function() {
   const currentRoomId = document.getElementById('room-id')?.value.trim();
   const currentPlayerName = document.getElementById('player-name')?.value.trim();
@@ -1866,17 +1866,33 @@ window.sendCharacterNetworkData = function() {
     if (acEl) armorClass = parseInt(acEl.textContent) || parseInt(acEl.value) || 10;
   }
 
-  window.window_gameSocket.send(JSON.stringify({
+  // Спецификация пакета: добавляем байты заголовков MQTT, чтобы бесплатный публичный брокер пропустил сообщение
+  const topic = `lore_weaver_room_${currentRoomId}`;
+  const messagePayload = JSON.stringify({
     type: 'PLAYER_UPDATE',
     sender: currentPlayerName,
-    payload: {
-      hp: currentHp,
-      maxHp: maxHp,
-      ac: armorClass,
-      class: charClass,
-      level: charLevel
-    }
-  }));
+    payload: { hp: currentHp, maxHp: maxHp, ac: armorClass, class: charClass, level: charLevel }
+  });
+
+  // Формируем чистый бинарный фрейм для HiveMQ
+  const opCode = 0x30; 
+  const topicLen = topic.length;
+  const remainingLen = 2 + topicLen + messagePayload.length;
+  
+  const buffer = new Uint8Array(2 + remainingLen);
+  buffer[0] = opCode;
+  buffer[1] = remainingLen;
+  buffer[2] = (topicLen >> 8) & 0xFF;
+  buffer[3] = topicLen & 0xFF;
+  
+  for (let i = 0; i < topicLen; i++) {
+    buffer[4 + i] = topic.charCodeAt(i);
+  }
+  for (let i = 0; i < messagePayload.length; i++) {
+    buffer[4 + topicLen + i] = messagePayload.charCodeAt(i);
+  }
+
+  window.window_gameSocket.send(buffer);
 };
 
 // Глобальный перехватчик кликов по кнопке подключения
@@ -1894,25 +1910,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (window.window_gameSocket) window.window_gameSocket.close();
 
-        // 🚀 ГАРАНТИРОВАННЫЙ КАНАЛ СВЯЗИ: Создаем уникальную комнату прямо в адресе WebSocket брокера free.piesocket
-        window.window_gameSocket = new WebSocket(`wss://://piesocket.com{roomId}?api_key=o7T6N7GZ679D67A8Z67G67D67&notify=1`);
+        // 🚀 НАДЁЖНЫЙ ЗАЩИЩЁННЫЙ WSS СЕРВЕР (Разрешён политикой GitHub Pages)
+        window.window_gameSocket = new WebSocket('wss://://hivemq.com');
+        window.window_gameSocket.binaryType = 'arraybuffer';
 
         window.window_gameSocket.onopen = () => {
-          console.log(`[Сеть] Подключено к выделенному каналу комнаты: ${roomId}`);
+          console.log(`[Сеть] Подключено к защищённому брокеру HiveMQ. Комната: ${roomId}`);
+          
+          // Отправляем пакет подключения сокета к топику нашей комнаты
+          const topic = `lore_weaver_room_${roomId}`;
+          const connectFrame = new Uint8Array([0x10, 12 + topic.length, 0x00, 0x04, 0x4d, 0x51, 0x54, 0x54, 0x04, 0x02, 0x00, 0x3c, 0x00, 0x00]);
+          window.window_gameSocket.send(connectFrame);
+
+          // ГМ и Игрок подписываются на сообщения этой комнаты
+          setTimeout(() => {
+            const subFrame = new Uint8Array(7 + topic.length);
+            subFrame[0] = 0x82; subFrame[1] = 5 + topic.length; subFrame[2] = 0x00; subFrame[3] = 0x01;
+            subFrame[4] = (topic.length >> 8) & 0xFF; subFrame[5] = topic.length & 0xFF;
+            for (let i = 0; i < topic.length; i++) subFrame[6 + i] = topic.charCodeAt(i);
+            subFrame[6 + topic.length] = 0x00;
+            window.window_gameSocket.send(subFrame);
+          }, 100);
+
           if (!isDM && playerName) {
             setTimeout(() => {
-              if (typeof window.sendCharacterNetworkData === 'function') {
-                window.sendCharacterNetworkData();
-              }
-            }, 600);
+              if (typeof window.sendCharacterNetworkData === 'function') window.sendCharacterNetworkData();
+            }, 800);
           }
         };
 
         window.window_gameSocket.onmessage = (event) => {
           try {
-            const data = JSON.parse(event.data);
+            if (!(event.data instanceof ArrayBuffer)) return;
+            const bytes = new Uint8Array(event.data);
+            if (bytes[0] !== 0x30) return; // Обрабатываем только пакеты PUBLISH
+
+            // Распаковываем текст сообщения из бинарного MQTT-пакета
+            const topicLen = (bytes[2] << 8) | bytes[3];
+            const payloadBytes = bytes.subarray(4 + topicLen);
+            const decoder = new TextDecoder('utf-8');
+            const data = JSON.parse(decoder.decode(payloadBytes));
             
-            // ГМ: Принимаем пакеты обновлений от живых игроков
+            // ГМ: Принимаем пакеты обновлений от реальных игроков
             if (isDM && data.type === 'PLAYER_UPDATE') {
               const pName = data.sender;
               const stats = data.payload;
@@ -1920,7 +1959,6 @@ document.addEventListener('DOMContentLoaded', () => {
               const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list') || document.querySelector('.dm-party-panel .dm-card-body');
               if (!partyListContainer) return;
 
-              // Стираем заглушку ожидания
               if (partyListContainer.textContent.includes('Ожидание подключения')) partyListContainer.innerHTML = '';
               const placeholder = partyListContainer.querySelector('.dm-empty-placeholder');
               if (placeholder) placeholder.remove();
@@ -1965,7 +2003,7 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             }
           } catch (e) {
-            // Игнорируем некорректные пакеты
+            // Игнорируем фоновый шум брокера
           }
         };
       }, 100);
@@ -1973,11 +2011,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// 🔥 УЛЬТИМАТИВНЫЙ РЕАКТИВНЫЙ ТРИГГЕР: ловим ЛЮБЫЕ клики на листе игрока и шлем пакет ГМу
+// 🔥 УЛЬТИМАТИВНЫЙ РЕАКТИВНЫЙ ТРИГГЕР: ловим любые клики на листе игрока
 document.addEventListener('click', () => {
   setTimeout(() => {
     if (typeof window.sendCharacterNetworkData === 'function') {
       window.sendCharacterNetworkData();
     }
-  }, 50);
+  }, 60);
 });
