@@ -1,40 +1,43 @@
 // ==========================================
-// 📡 ИЗОЛИРОВАННЫЙ РЕАКТИВНЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER»
+// 📡 ИЗОЛИРОВАННЫЙ СЕТЕВОЙ МОДУЛЬ «LORE WEAVER» (MQTT)
 // ==========================================
 window.window_mqttClient = null;
 window.currentConnectedRoom = null;
 
-// Функция ИГРОКА: собирает статы напрямую по тексту на экране
+// Функция ИГРОКА: собирает статы из глобального стейта или инпутов
 window.sendCharacterNetworkData = function() {
   const roomIdInput = document.getElementById('room-id');
   const playerNameInput = document.getElementById('player-name');
-  const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
+  const partyListContainer = document.getElementById('dm-party-list') || document.getElementById('dm-party-results');
 
   const currentRoomId = window.currentConnectedRoom || roomIdInput?.value.trim();
   const currentPlayerName = playerNameInput?.value.trim();
 
+  // Если это экран ГМа или нет коннекта/комнаты/имени — отмена
   if (partyListContainer || !currentRoomId || !currentPlayerName || !window.window_mqttClient || !window.window_mqttClient.isConnected()) return;
 
+  // Берем ХП и КД из глобального состояния твоего движка (characterState)
   let currentHp = 10;
   let maxHp = 10;
   let armorClass = 10;
   let charClass = 'Игрок';
   let charLevel = 1;
 
-  const hpMatch = document.body.innerText.match(/(\d+)\s*[\/|]\s*(\d+)/);
-  if (hpMatch) {
-    currentHp = parseInt(hpMatch[1]) || 10;
-    maxHp = parseInt(hpMatch[2]) || 10;
-  }
-
-  const acMatch = document.body.innerText.match(/КД\s*:\s*(\d+)/i) || document.body.innerText.match(/(\d+)\s*КД/i);
-  if (acMatch) {
-    armorClass = parseInt(acMatch[1]) || 10;
-  }
-
   if (typeof characterState !== 'undefined') {
+    if (characterState.hpCurrent !== undefined) currentHp = characterState.hpCurrent;
+    if (characterState.hpMax !== undefined) maxHp = characterState.hpMax;
+    if (characterState.ac !== undefined) armorClass = characterState.ac;
     if (characterState.class) charClass = characterState.class;
     if (characterState.level) charLevel = parseInt(characterState.level) || 1;
+  } else {
+    // Резервный сбор по селекторам из ui.js
+    const hpInput = document.querySelector('.hp-current-input') || document.getElementById('current-hp');
+    const hpMaxInput = document.querySelector('.hp-max-input') || document.getElementById('max-hp');
+    const acInput = document.querySelector('.shield-value') || document.getElementById('armor-class');
+
+    if (hpInput) currentHp = parseInt(hpInput.value) || parseInt(hpInput.textContent) || 10;
+    if (hpMaxInput) maxHp = parseInt(hpMaxInput.value) || parseInt(hpMaxInput.textContent) || 10;
+    if (acInput) armorClass = parseInt(acInput.textContent) || parseInt(acInput.value) || 10;
   }
 
   const packet = JSON.stringify({
@@ -47,16 +50,19 @@ window.sendCharacterNetworkData = function() {
     const message = new Paho.MQTT.Message(packet);
     message.destinationName = `lw_vtt_global_room_${currentRoomId}`;
     window.window_mqttClient.send(message);
-    console.log(`%c[Сеть ПЕРЕДАТЧИК] Данные игрока ${currentPlayerName} отправлены ГМу: ${currentHp}/${maxHp} ХП`, 'color: #00ff00; font-weight: bold;');
+    console.log(`%c[Сеть ПЕРЕДАТЧИК] Данные отправлены ГМу: ${currentHp}/${maxHp} ХП`, 'color: #00ff00; font-weight: bold;');
   } catch (e) {
     console.error('[Сеть] Ошибка отправки пакета:', e);
   }
 };
 
 // Функция инициализации сети MQTT
-window.initNetworkSession = function(roomId, playerName) {
+window.initNetworkSession = function(roomId, playerName, isDM) {
   if (!roomId) return;
-  if (typeof Paho === 'undefined') return;
+  if (typeof Paho === 'undefined') {
+    console.error('[Сеть] Библиотека Paho MQTT не найдена на странице!');
+    return;
+  }
 
   if (window.window_mqttClient && window.window_mqttClient.isConnected()) {
     window.window_mqttClient.disconnect();
@@ -71,6 +77,7 @@ window.initNetworkSession = function(roomId, playerName) {
       const data = JSON.parse(message.payloadString);
       const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
       
+      // ГМ: Принимаем пакеты обновлений от живых игроков
       if (partyListContainer && data.type === 'PLAYER_UPDATE') {
         const pName = data.sender;
         const stats = data.payload;
@@ -127,35 +134,42 @@ window.initNetworkSession = function(roomId, playerName) {
       console.log(`%c[Сеть] ПОДКЛЮЧЕНО К СЕРВЕРУ! Комната: ${roomId}`, 'color: #00ff00; font-weight: bold;');
       window.window_mqttClient.subscribe(`lw_vtt_global_room_${roomId}`);
 
-      const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list');
-      if (!partyListContainer && playerName) {
-        setTimeout(window.sendCharacterNetworkData, 300);
+      // ИГРОК: Принудительно шлем первый пакет ГМу при подключении
+      if (!isDM && playerName) {
+        setTimeout(window.sendCharacterNetworkData, 400);
       }
     },
-    onFailure: (err) => console.error('[Сеть] Ошибка коннекта:', err),
+    onFailure: (err) => console.error('[Сеть] Ошибка коннекта к брокеру:', err),
     useSSL: true
   });
 };
 
-// 🎯 MUTATION OBSERVER: Беспрепятственно ловит статусы БЕЗ ЗАМОРОЗОК ПОТОКА
-const observer = new MutationObserver(() => {
-  const roomIdInput = document.getElementById('room-id');
-  const playerNameInput = document.getElementById('player-name');
-  
-  if (!window.window_mqttClient || !window.window_mqttClient.isConnected()) {
-    const statusText = document.body.innerText;
-    const statusMatch = statusText.match(/Подключен[оа]?\s+к\s+([a-zA-Z0-9а-яА-Я_]+)/i) || 
-                        statusText.match(/Подключен[оа]?\s*:\s*([a-zA-Z0-9а-яА-Я_]+)/i);
-    
-    if (statusMatch && roomIdInput && roomIdInput.value) {
-      const activeRoom = statusMatch[1];
-      const activeName = playerNameInput ? playerNameInput.value.trim() : "Игрок";
-      window.initNetworkSession(activeRoom, activeName);
-    }
-  }
+// 🎯 СИЛОВОЙ ПЕРЕХВАТЧИК КЛИКА: запускает сеть по нажатию кнопки «ПОДКЛЮЧИТЬСЯ» в обход любых текстовых плашек
+document.addEventListener('click', (e) => {
+  if (e.target && (e.target.id === 'netConnectBtn' || e.target.textContent.includes('ПОДКЛЮЧИТЬСЯ'))) {
+    // Даем твоему основному коду 150мс, чтобы он выполнил переключение интерфейса
+    setTimeout(() => {
+      const roomIdInput = document.getElementById('room-id');
+      const playerNameInput = document.getElementById('player-name');
+      const partyListContainer = document.getElementById('dm-party-list') || document.getElementById('dm-party-results');
 
-  if (window.window_mqttClient && window.window_mqttClient.isConnected()) {
-    window.sendCharacterNetworkData();
+      const roomId = roomIdInput?.value.trim();
+      const playerName = playerNameInput ? playerNameInput.value.trim() : "Мастер";
+      const isDM = !!partyListContainer;
+
+      if (roomId) {
+        console.log(`[Сеть] Силовой ручной запуск сессии для комнаты: ${roomId}`);
+        window.initNetworkSession(roomId, playerName, isDM);
+      }
+    }, 150);
   }
 });
-observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+// 🔥 УЛЬТИМАТИВНЫЙ РЕАКТИВНЫЙ ТРИГГЕР: Кликаешь в любое место экрана игрока — обновленные ХП летят ГМу
+document.addEventListener('click', () => {
+  setTimeout(() => {
+    if (typeof window.sendCharacterNetworkData === 'function') {
+      window.sendCharacterNetworkData();
+    }
+  }, 80);
+});
