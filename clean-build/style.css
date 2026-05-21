@@ -4135,38 +4135,12 @@ body::before {
 .dm-screen-container .dm-grid {
   display: grid !important;
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* На ПК: верх свободный, справочник аккуратно занимает 360px */
+  /* На ПК и планшетах: верх свободный под игроков, справочник строго 360px */
   grid-template-rows: 1fr 360px !important;    
   gap: 20px !important;
   width: 100% !important;
-  height: calc(100vh - 60px) !important;
+  height: calc(100vh - 60px) !important; /* Жестко держим рамки экрана */
   margin: 0 !important;
-}
-
-/* 📱 Адаптация экрана ГМа для планшетов (iPad Air, iPad Pro и аналоги до 1400px) */
-@media (max-width: 1400px) {
-  .dm-screen-container .dm-grid {
-    grid-template-columns: 1fr 1fr !important; /* На планшетах панели делят ширину 50/50 */
-    /* Выделяем под справочник ровно 450px — это как раз поднимет его линию выше на 2 см */
-    grid-template-rows: 1fr 450px !important; 
-    gap: 20px !important;
-    height: calc(100vh - 40px) !important; /* Намертво прижимаем интерфейс к рамкам экрана */
-  }
-
-  /* СБРАСЫВАЕМ жесткую минимальную высоту, которая ломала макет на iPad */
-  .dm-screen-container .dm-party-panel,
-  .dm-screen-container .dm-initiative-panel {
-    min-height: auto !important;
-    height: 100% !important;
-  }
-
-  /* Заставляем Справочник занять всю ширину экрана планшета под карточками */
-  .dm-screen-container .dm-compendium-panel {
-    grid-column: span 2 !important;
-    grid-row: 2 !important;
-    min-height: auto !important;
-    height: 100% !important;
-  }
 }
 /* 📲 Адаптация экрана ГМа для вертикальных экранов и телефонов */
 @media (max-width: 768px) {
