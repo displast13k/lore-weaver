@@ -4135,48 +4135,45 @@ body::before {
 .dm-screen-container .dm-grid {
   display: grid !important;
   grid-template-columns: 1.2fr 0.8fr !important; 
-  /* На ПК: верхний ряд свободный (1fr), справочник занимает стабильные 360px */
-  grid-template-rows: 1fr 360px !important;    
+  /* Магия: верхний ряд всегда 500px, а Справочник снизу всегда 320px — железный баланс! */
+  grid-template-rows: 500px 320px !important;    
   gap: 20px !important;
   width: 100% !important;
-  height: calc(100vh - 60px) !important;
+  height: auto !important; /* Отпускаем высоту, чтобы блоки не сжимались браузером планшета */
   margin: 0 !important;
 }
 
-/* Координаты блоков ГМа на ПК: Панель партии слева сверху */
+/* Координаты и фоны блоков ГМа */
 .dm-screen-container .dm-party-panel {
   grid-column: 1 !important;
   grid-row: 1 !important;
-  background: rgba(20, 5, 5, 0.85) !important; /* Каноничный темный фон */
-  border: 1px solid #4a1111 !important;        /* Бордовая рамка */
+  background: rgba(20, 5, 5, 0.85) !important;
+  border: 1px solid #4a1111 !important;        
+  height: 100% !important;
 }
 
-/* На ПК: Инициатива справа сверху (занимает только первый ряд) */
 .dm-screen-container .dm-initiative-panel {
   grid-column: 2 !important;
   grid-row: 1 !important;
   background: rgba(20, 5, 5, 0.85) !important;
   border: 1px solid #4a1111 !important;
+  height: 100% !important;
 }
 
-/* На ПК: Справочник занимает ВЕСЬ нижний ряд на всю ширину */
 .dm-screen-container .dm-compendium-panel {
-  grid-column: span 2 !important; 
+  grid-column: span 2 !important; /* Растягиваем справочник на всю ширину под верхними блоками */
   grid-row: 2 !important;
-  height: 100% !important;
   background: rgba(20, 5, 5, 0.85) !important;
   border: 1px solid #4a1111 !important;
+  height: 100% !important;
 }
 
-/* 📱 Адаптация высоты ТОЛЬКО для планшетов (экраны до 1400px, вроде iPad Pro) */
+/* 📱 Адаптация под планшеты (больше не ломает пропорции, просто убирает лишние отступы) */
 @media (max-width: 1400px) {
   .dm-screen-container .dm-grid {
-    grid-template-columns: 1.2fr 0.8fr !important; 
-    /* ЖЕСТКО: верх свободный (1fr), а Справочнику выделяем честные 280px высоты, сажая в рамку! */
-    grid-template-rows: 1fr 280px !important; 
-    gap: 20px !important;
-    height: calc(100vh - 40px) !important; /* Насильно запираем сетку в рамки экрана планшета */
+    gap: 15px !important; /* Чуть уменьшаем зазоры на планшетах для компактности */
   }
+}
 
   /* Принудительно заставляем внутренний блок справочника занять все выделенные 280 пикселей */
   .dm-screen-container .dm-compendium-panel {
