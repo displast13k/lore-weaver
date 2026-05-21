@@ -1848,20 +1848,35 @@ function sendCharacterNetworkData() {
   const currentPlayerName = document.getElementById('player-name')?.value.trim();
   const isDM = document.getElementById('is-dm-checkbox')?.checked || false;
 
-  if (isDM || !currentRoomId || !currentPlayerName || !window_gameSocket || window_gameSocket.readyState !== WebSocket.OPEN) return;
+  if (isDM || !currentRoomId || !currentPlayerName || !window.window_gameSocket || window.window_gameSocket.readyState !== WebSocket.OPEN) return;
 
-  const currentHpInput = document.querySelector('.hp-current-input');
+  // Пытаемся взять ХП из глобального состояния персонажа, если инпут не найден
+  let currentHp = 10;
+  if (typeof characterState !== 'undefined' && characterState.hpCurrent !== undefined) {
+    currentHp = characterState.hpCurrent;
+  } else {
+    const hpInput = document.querySelector('.hp-current-input');
+    currentHp = hpInput ? parseInt(hpInput.value) || 10 : 10;
+  }
+
+  // Пытаемся взять КД (Класс Доспеха)
+  let armorClass = 10;
   const shieldValueEl = document.querySelector('.shield-value');
+  if (shieldValueEl) {
+    armorClass = parseInt(shieldValueEl.textContent) || 10;
+  } else if (typeof characterState !== 'undefined' && characterState.ac !== undefined) {
+    armorClass = characterState.ac;
+  }
 
   const characterSnapshot = {
-    hp: currentHpInput ? parseInt(currentHpInput.value) || 10 : 10,
+    hp: currentHp,
     maxHp: typeof characterState !== 'undefined' ? characterState.hpMax || 10 : 10,
-    ac: shieldValueEl ? parseInt(shieldValueEl.textContent) || 10 : 10,
-    class: typeof characterState !== 'undefined' ? characterState.class || 'Воин' : 'Воин',
+    ac: armorClass,
+    class: typeof characterState !== 'undefined' ? characterState.class || 'Бард' : 'Бард',
     level: typeof characterState !== 'undefined' ? characterState.level || 1 : 1
   };
 
-  window_gameSocket.send(JSON.stringify({
+  window.window_gameSocket.send(JSON.stringify({
     type: 'PLAYER_UPDATE',
     sender: currentPlayerName,
     payload: characterSnapshot
