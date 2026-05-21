@@ -1949,5 +1949,13 @@ document.addEventListener('DOMContentLoaded', () => {
           console.error('[Сеть] Ошибка парсинга пакета:', e);
         }
       };
-  }, 2000);
-//}); // Закрывает глобальный DOMContentLoaded со 2-й строки ui.js
+    });
+  }
+});
+
+// Автоматический триггер: шлем данные ГМу каждый раз, когда игрок меняет ХП на экране
+document.addEventListener('change', (e) => {
+  if (e.target && e.target.classList.contains('hp-current-input')) {
+    sendCharacterNetworkData();
+  }
+});
