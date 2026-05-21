@@ -1842,7 +1842,7 @@ if (netConnectBtn) {
 // ==========================================
 let window_gameSocket = null;
 
-// Функция ИГРОКА: Гарантированный сбор данных напрямую из интерфейса
+// Функция ИГРОКА: Сбор данных напрямую из интерфейса
 function sendCharacterNetworkData() {
   const currentRoomId = document.getElementById('room-id')?.value.trim();
   const currentPlayerName = document.getElementById('player-name')?.value.trim();
@@ -1850,7 +1850,6 @@ function sendCharacterNetworkData() {
 
   if (isDM || !currentRoomId || !currentPlayerName || !window_gameSocket || window_gameSocket.readyState !== WebSocket.OPEN) return;
 
-  // Безопасно собираем текущие значения здоровья из текстовых блоков или инпутов
   let currentHp = 10;
   let maxHp = 10;
   
@@ -1859,7 +1858,6 @@ function sendCharacterNetworkData() {
     if (hpContainer.value) {
       currentHp = parseInt(hpContainer.value) || 10;
     } else if (hpContainer.textContent) {
-      // Если ХП выводится как "11/11", вытаскиваем первую цифру
       const match = hpContainer.textContent.match(/(\d+)\s*\/\s*(\d+)/);
       if (match) {
         currentHp = parseInt(match[1]) || 10;
@@ -1870,7 +1868,6 @@ function sendCharacterNetworkData() {
     }
   }
 
-  // Если из верстки maxHp не достали, пробуем взять из глобального состояния
   if (maxHp === 10 && typeof characterState !== 'undefined' && characterState.hpMax) {
     maxHp = characterState.hpMax;
   }
@@ -1878,7 +1875,6 @@ function sendCharacterNetworkData() {
     currentHp = characterState.hpCurrent;
   }
 
-  // Пытаемся забрать Класс Доспеха (КД)
   let armorClass = 10;
   const shieldValueEl = document.querySelector('.shield-value') || document.querySelector('.ac-value') || document.querySelector('[class*="ac"]');
   if (shieldValueEl) {
@@ -1887,7 +1883,6 @@ function sendCharacterNetworkData() {
     armorClass = characterState.ac;
   }
 
-  // Пытаемся забрать класс персонажа
   let charClass = 'Бард';
   const classSelect = document.getElementById('char-class') || document.querySelector('.class-select');
   if (classSelect && classSelect.value) {
@@ -1896,28 +1891,27 @@ function sendCharacterNetworkData() {
     charClass = characterState.class;
   }
 
-  const characterSnapshot = {
-    hp: currentHp,
-    maxHp: maxHp,
-    ac: armorClass,
-    class: charClass,
-    level: typeof characterState !== 'undefined' ? characterState.level || 1 : 1
-  };
-
+  // Отправляем пакет данных через открытый ретранслятор
   window_gameSocket.send(JSON.stringify({
+    room: currentRoomId,
     type: 'PLAYER_UPDATE',
     sender: currentPlayerName,
-    payload: characterSnapshot
+    payload: {
+      hp: currentHp,
+      maxHp: maxHp,
+      ac: armorClass,
+      class: charClass,
+      level: typeof characterState !== 'undefined' ? characterState.level || 1 : 1
+    }
   }));
 }
 
 // Глобальный перехватчик кликов по кнопке подключения
 document.addEventListener('DOMContentLoaded', () => {
-  const connectBtn = document.getElementById('netConnectBtn') || document.querySelector('.net-sidebar button') || document.querySelector('button[id*="Connect"]');
+  const connectBtn = document.getElementById('netConnectBtn') || document.querySelector('.net-sidebar button');
   
   if (connectBtn) {
     connectBtn.addEventListener('click', () => {
-      // Небольшая задержка, чтобы инпуты успели обновить свои значения в DOM
       setTimeout(() => {
         const roomId = document.getElementById('room-id')?.value.trim();
         const playerName = document.getElementById('player-name')?.value.trim();
@@ -1927,14 +1921,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (window_gameSocket) window_gameSocket.close();
 
-        // Открываем WebSocket-соединение через бесплатный брокер
-        window_gameSocket = new WebSocket(`wss://://piesocket.com{roomId}?api_key=VCpe6vCgSOfnH62309icC2Z9Al6gbe6p&notify=1`);
+        // 🚀 ПЕРЕКЛЮЧАЕМСЯ НА БЕСПЛАТНЫЙ ПУБЛИЧНЫЙ СЕРВЕР БЕЗ КЛЮЧЕЙ И ЛИМИТОВ
+        window_gameSocket = new WebSocket('wss://://socketsbay.com');
 
         window_gameSocket.onopen = () => {
-          console.log(`[Сеть] Подключено к комнате ${roomId}. Роль: ${isDM ? 'ГМ' : 'Игрок'}`);
-          // ИГРОК: Даем сокету 500мс прогреться и принудительно выстреливаем пакет ГМу
+          console.log(`[Сеть] Подключено к свободному брокеру. Комната: ${roomId}`);
           if (!isDM && playerName) {
-            setTimeout(sendCharacterNetworkData, 500);
+            setTimeout(sendCharacterNetworkData, 600);
           }
         };
 
@@ -1942,7 +1935,10 @@ document.addEventListener('DOMContentLoaded', () => {
           try {
             const data = JSON.parse(event.data);
             
-            // ГМ: Ловим пакеты обновлений от реальных игроков
+            // Фильтруем сообщения: обрабатываем только те, что принадлежат нашей комнате ROOM_ID
+            if (data.room !== roomId) return;
+            
+            // ГМ: Принимаем обновления от реальных игроков
             if (isDM && data.type === 'PLAYER_UPDATE') {
               const pName = data.sender;
               const stats = data.payload;
@@ -1950,18 +1946,13 @@ document.addEventListener('DOMContentLoaded', () => {
               
               if (!partyListContainer) return;
 
-              // Стираем заглушку, если она всё ещё висит на экране мастера
-              const placeholder = partyListContainer.querySelector('.dm-empty-placeholder');
-              if (placeholder) placeholder.remove();
               if (partyListContainer.textContent.includes('Ожидание подключения')) partyListContainer.innerHTML = '';
 
               let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
               
-              // Рассчитываем проценты ХП по твоей формуле
               const netHpPercent = Math.max(0, Math.min(100, (stats.hp / stats.maxHp) * 100));
               const netBarColor = netHpPercent < 30 ? '#ff3333' : '#22aa44';
 
-              // Полный слепок твоей фирменной верстки карточек (ур. класса, КД, прогресс-бар)
               const netPlayerHTML = `
                 <div class="dm-player-card" data-network-player="${pName}">
                   <div class="dm-player-info">
@@ -1986,7 +1977,6 @@ document.addEventListener('DOMContentLoaded', () => {
               if (!netCard) {
                 partyListContainer.insertAdjacentHTML('beforeend', netPlayerHTML);
               } else {
-                // Если игрок уже есть — реактивно двигаем полоску здоровья и переписываем КД
                 netCard.querySelector('.dm-hp-text').textContent = `ХП: ${stats.hp} / ${stats.maxHp}`;
                 const hpFill = netCard.querySelector('.dm-hp-progress-fill');
                 if (hpFill) {
@@ -1998,7 +1988,7 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             }
           } catch (e) {
-            console.error('[Сеть] Ошибка парсинга пакета:', e);
+            // Игнорируем чужие пакеты на публичном демо-сервере
           }
         };
       }, 100);
@@ -2012,3 +2002,4 @@ document.addEventListener('change', (e) => {
     sendCharacterNetworkData();
   }
 });
+
