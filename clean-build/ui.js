@@ -1903,7 +1903,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         window.window_gameSocket.onopen = () => {
           console.log(`[Сеть] Подключено к брокеру SocketsBay. Комната: ${roomId}`);
-          // Вызываем глобальную функцию через объект window
           if (!isDM && playerName) {
             setTimeout(() => {
               if (typeof window.sendCharacterNetworkData === 'function') {
@@ -1922,13 +1921,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isDM && data.type === 'PLAYER_UPDATE') {
               const pName = data.sender;
               const stats = data.payload;
-              const partyListContainer = document.getElementById('dm-party-list');
+              
+              // 🎯 ИСПРАВЛЕНИЕ: Явно находим и объявляем контейнер панели
+              const partyListContainer = document.getElementById('dm-party-results') || document.getElementById('dm-party-list') || document.querySelector('.dm-party-panel .dm-card-body');
               
               if (!partyListContainer) return;
 
+              // Безопасная очистка плейсхолдера ожидания
+              if (partyListContainer.textContent.includes('Ожидание подключения')) {
+                partyListContainer.innerHTML = '';
+              }
               const placeholder = partyListContainer.querySelector('.dm-empty-placeholder');
               if (placeholder) placeholder.remove();
-              if (partyListContainer.textContent.includes('Ожидание подключения')) partyListContainer.innerHTML = '';
 
               let netCard = partyListContainer.querySelector(`[data-network-player="${pName}"]`);
               
@@ -1970,7 +1974,7 @@ document.addEventListener('DOMContentLoaded', () => {
               }
             }
           } catch (e) {
-            // Игнорируем битые пакеты
+            console.error('[Сеть] Ошибка парсинга пакета:', e);
           }
         };
       }, 100);
