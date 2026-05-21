@@ -144,10 +144,13 @@ window.initNetworkSession = function(roomId, playerName, isDM) {
   });
 };
 
-// 🎯 СИЛОВОЙ ПЕРЕХВАТЧИК КЛИКА: запускает сеть по нажатию кнопки «ПОДКЛЮЧИТЬСЯ»
+// 🎯 СИЛОВОЙ ВСЕЯДНЫЙ ПЕРЕХВАТЧИК КЛИКА: Запускает сокет ГМу и Игроку при любом нажатии на кнопку коннекта
 document.addEventListener('click', (e) => {
-  if (e.target && (e.target.id === 'netConnectBtn' || e.target.textContent.includes('ПОДКЛЮЧИТЬСЯ'))) {
-    // Даем твоему основному коду 150мс, чтобы он выполнил переключение интерфейса
+  // Метод closest найдет кнопку, даже если кликнули по тексту внутри нее!
+  const connectBtn = e.target.closest('#netConnectBtn') || e.target.closest('.net-sidebar button') || (e.target.textContent && e.target.textContent.includes('ПОДКЛЮЧИТЬСЯ') ? e.target : null);
+  
+  if (connectBtn) {
+    // Даем оригинальному коду ui.js 150мс, чтобы он переключил роли и интерфейс
     setTimeout(() => {
       const roomIdInput = document.getElementById('room-id');
       const playerNameInput = document.getElementById('player-name');
@@ -158,18 +161,9 @@ document.addEventListener('click', (e) => {
       const isDM = !!partyListContainer;
 
       if (roomId) {
-        console.log(`[Сеть] Силовой ручной запуск сессии для комнаты: ${roomId}`);
+        console.log(`[Сеть] Железный перехват кнопки коннекта. Запуск комнаты: ${roomId}`);
         window.initNetworkSession(roomId, playerName, isDM);
       }
     }, 150);
   }
-});
-
-// 🔥 УЛЬТИМАТИВНЫЙ РЕАКТИВНЫЙ ТРИГГЕР: Кликаешь в любое место экрана игрока — обновленные ХП летят ГМу
-document.addEventListener('click', () => {
-  setTimeout(() => {
-    if (typeof window.sendCharacterNetworkData === 'function') {
-      window.sendCharacterNetworkData();
-    }
-  }, 80);
 });
