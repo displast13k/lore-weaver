@@ -1604,7 +1604,6 @@ if (netConnectBtn) {
     }
     } else {
       if (screenRoot) screenRoot.classList.remove('dm-mode-active');
-      if (dmScreen) screenScreen?.style ? dmScreen.style.display = 'none' : null;
       if (dmScreen) dmScreen.style.display = 'none';
 
       // Симулятор сети: Игрок сохраняет данные в локальную память браузера
